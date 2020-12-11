@@ -225,7 +225,8 @@ func checkLine(line string, toCheck map[string]func(line string) int) (int, int)
 	return checks1, checks2
 }
 
-func countChecks(check1 int, check2 int, valid1 *int, valid2 *int) {
+func countChecks(line string, toCheck map[string]func(line string) int, valid1 *int, valid2 *int) {
+	check1, check2 := checkLine(line, toCheck)
 	if check1 == 7 {
 		*valid1++
 	}
@@ -259,8 +260,7 @@ func main() {
 		line := scanner.Text()
 
 		if line == "" {
-			check1, check2 := checkLine(text, toCheck)
-			countChecks(check1, check2, &valid1, &valid2)
+			countChecks(text, toCheck, &valid1, &valid2)
 
 			text = ""
 			continue
@@ -273,8 +273,7 @@ func main() {
 		log.Println(err)
 	}
 
-	check1, check2 := checkLine(text, toCheck)
-	countChecks(check1, check2, &valid1, &valid2)
+	countChecks(text, toCheck, &valid1, &valid2)
 
 	fmt.Println("Part1: ", valid1)
 	fmt.Println("Part2: ", valid2)
