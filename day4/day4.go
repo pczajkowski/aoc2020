@@ -188,8 +188,8 @@ func checkPid(line string) int {
 	return 0
 }
 
-func getChecks() map[string]func(line string) int {
-	toCheck := make(map[string]func(line string) int)
+func getChecks() map[string]func(string) int {
+	toCheck := make(map[string]func(string) int)
 	toCheck["byr:"] = checkByr
 	toCheck["iyr:"] = checkIyr
 	toCheck["eyr:"] = checkEyr
@@ -201,7 +201,7 @@ func getChecks() map[string]func(line string) int {
 	return toCheck
 }
 
-func performCheck(line string, name string, check func(line string) int) (int, int) {
+func performCheck(line string, name string, check func(string) int) (int, int) {
 	check1 := 0
 	check2 := 0
 	if strings.Contains(line, name) {
@@ -212,7 +212,7 @@ func performCheck(line string, name string, check func(line string) int) (int, i
 	return check1, check2
 }
 
-func checkLine(line string, toCheck map[string]func(line string) int) (int, int) {
+func checkLine(line string, toCheck map[string]func(string) int) (int, int) {
 	checks1 := 0
 	checks2 := 0
 
@@ -225,7 +225,7 @@ func checkLine(line string, toCheck map[string]func(line string) int) (int, int)
 	return checks1, checks2
 }
 
-func countChecks(line string, toCheck map[string]func(line string) int, valid1 *int, valid2 *int) {
+func countChecks(line string, toCheck map[string]func(string) int, valid1 *int, valid2 *int) {
 	check1, check2 := checkLine(line, toCheck)
 	if check1 == 7 {
 		*valid1++
