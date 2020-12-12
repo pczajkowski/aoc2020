@@ -42,6 +42,7 @@ func readFile(file *os.File) ([]sequence, error) {
 
 var directions []string
 var directionsMap map[string]int
+var opposites map[string]string
 
 func getDirections() {
 	directions = []string{"E", "S", "W", "N"}
@@ -50,6 +51,12 @@ func getDirections() {
 	for index, value := range directions {
 		directionsMap[value] = index
 	}
+
+	opposites = make(map[string]string)
+	opposites["E"] = "W"
+	opposites["W"] = "E"
+	opposites["N"] = "S"
+	opposites["S"] = "N"
 }
 
 func rotate(currentDirection string, item sequence) string {
@@ -81,47 +88,15 @@ func rotate(currentDirection string, item sequence) string {
 type cooridinates map[string]int
 
 func makeMove(item sequence, position cooridinates) cooridinates {
-	switch item.action {
-	case "E":
-		if position["W"] > 0 {
-			position["W"] = position["W"] - item.value
-			if position["W"] < 0 {
-				position["E"] -= position["W"]
-				position["W"] = 0
-			}
-		} else {
-			position["E"] += item.value
+	opposite := opposites[item.action]
+	if position[opposite] > 0 {
+		position[opposite] = position[opposite] - item.value
+		if position[opposite] < 0 {
+			position[item.action] -= position[opposite]
+			position[opposite] = 0
 		}
-	case "W":
-		if position["E"] > 0 {
-			position["E"] = position["E"] - item.value
-			if position["E"] < 0 {
-				position["W"] -= position["E"]
-				position["E"] = 0
-			}
-		} else {
-			position["W"] += item.value
-		}
-	case "N":
-		if position["S"] > 0 {
-			position["S"] = position["S"] - item.value
-			if position["S"] < 0 {
-				position["N"] -= position["S"]
-				position["S"] = 0
-			}
-		} else {
-			position["N"] += item.value
-		}
-	case "S":
-		if position["N"] > 0 {
-			position["N"] = position["N"] - item.value
-			if position["N"] < 0 {
-				position["S"] -= position["N"]
-				position["N"] = 0
-			}
-		} else {
-			position["S"] += item.value
-		}
+	} else {
+		position[item.action] += item.value
 	}
 
 	return position
