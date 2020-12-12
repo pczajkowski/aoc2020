@@ -154,9 +154,15 @@ func navigate(sequences []sequence) int {
 	return sum
 }
 
-func rotateWaypoint(waypoint cooridinates) cooridinates {
+func rotateWaypoint(waypoint cooridinates, item sequence) cooridinates {
+	newWaypoint := make(cooridinates)
 
-	return waypoint
+	for key, value := range waypoint {
+		newKey := rotate(key, item)
+		newWaypoint[newKey] = value
+	}
+
+	return newWaypoint
 }
 
 func navigate2(sequences []sequence) int {
@@ -165,17 +171,23 @@ func navigate2(sequences []sequence) int {
 	currentPosition["W"] = 0
 	currentPosition["N"] = 0
 	currentPosition["S"] = 0
-	//currentWaypoint := cooridinates{north: 1, south: 0, east: 10, west: 0}
+
+	currentWaypoint := make(cooridinates)
+	currentWaypoint["E"] = 10
+	currentWaypoint["W"] = 0
+	currentWaypoint["N"] = 1
+	currentWaypoint["S"] = 0
 
 	for _, item := range sequences {
 		switch item.action {
 		case "L", "R":
-			//currentDirection = rotate(currentDirection, item)
+			currentWaypoint = rotateWaypoint(currentWaypoint, item)
 		case "E", "W", "N", "S":
-			//currentPosition = makeMove(item, currentPosition)
+			currentWaypoint = makeMove(item, currentWaypoint)
 		case "F":
-			//item.action = currentDirection
-			//currentPosition = makeMove(item, currentPosition)
+			for key, value := range currentWaypoint {
+				currentPosition = makeMove(sequence{action: key, value: value * item.value}, currentPosition)
+			}
 		}
 	}
 
@@ -208,4 +220,5 @@ func main() {
 	file.Close()
 
 	fmt.Println("Part1:", navigate(sequences))
+	fmt.Println("Part2:", navigate2(sequences))
 }
