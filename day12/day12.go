@@ -78,54 +78,49 @@ func rotate(currentDirection string, item sequence) string {
 	return directions[newDirectionIndex]
 }
 
-type cooridinates struct {
-	north int
-	south int
-	east  int
-	west  int
-}
+type cooridinates map[string]int
 
 func makeMove(item sequence, position cooridinates) cooridinates {
 	switch item.action {
 	case "E":
-		if position.west > 0 {
-			position.west = position.west - item.value
-			if position.west < 0 {
-				position.east -= position.west
-				position.west = 0
+		if position["W"] > 0 {
+			position["W"] = position["W"] - item.value
+			if position["W"] < 0 {
+				position["E"] -= position["W"]
+				position["W"] = 0
 			}
 		} else {
-			position.east += item.value
+			position["E"] += item.value
 		}
 	case "W":
-		if position.east > 0 {
-			position.east = position.east - item.value
-			if position.east < 0 {
-				position.west -= position.east
-				position.east = 0
+		if position["E"] > 0 {
+			position["E"] = position["E"] - item.value
+			if position["E"] < 0 {
+				position["W"] -= position["E"]
+				position["E"] = 0
 			}
 		} else {
-			position.west += item.value
+			position["W"] += item.value
 		}
 	case "N":
-		if position.south > 0 {
-			position.south = position.south - item.value
-			if position.south < 0 {
-				position.north -= position.south
-				position.south = 0
+		if position["S"] > 0 {
+			position["S"] = position["S"] - item.value
+			if position["S"] < 0 {
+				position["N"] -= position["S"]
+				position["S"] = 0
 			}
 		} else {
-			position.north += item.value
+			position["N"] += item.value
 		}
 	case "S":
-		if position.north > 0 {
-			position.north = position.north - item.value
-			if position.north < 0 {
-				position.south -= position.north
-				position.north = 0
+		if position["N"] > 0 {
+			position["N"] = position["N"] - item.value
+			if position["N"] < 0 {
+				position["S"] -= position["N"]
+				position["N"] = 0
 			}
 		} else {
-			position.south += item.value
+			position["S"] += item.value
 		}
 	}
 
@@ -134,7 +129,11 @@ func makeMove(item sequence, position cooridinates) cooridinates {
 
 func navigate(sequences []sequence) int {
 	currentDirection := "E"
-	currentPosition := cooridinates{north: 0, south: 0, east: 0, west: 0}
+	currentPosition := make(cooridinates)
+	currentPosition["E"] = 0
+	currentPosition["W"] = 0
+	currentPosition["N"] = 0
+	currentPosition["S"] = 0
 
 	for _, item := range sequences {
 		switch item.action {
@@ -148,7 +147,43 @@ func navigate(sequences []sequence) int {
 		}
 	}
 
-	return currentPosition.north + currentPosition.south + currentPosition.east + currentPosition.west
+	sum := 0
+	for _, value := range currentPosition {
+		sum += value
+	}
+	return sum
+}
+
+func rotateWaypoint(waypoint cooridinates) cooridinates {
+
+	return waypoint
+}
+
+func navigate2(sequences []sequence) int {
+	currentPosition := make(cooridinates)
+	currentPosition["E"] = 0
+	currentPosition["W"] = 0
+	currentPosition["N"] = 0
+	currentPosition["S"] = 0
+	//currentWaypoint := cooridinates{north: 1, south: 0, east: 10, west: 0}
+
+	for _, item := range sequences {
+		switch item.action {
+		case "L", "R":
+			//currentDirection = rotate(currentDirection, item)
+		case "E", "W", "N", "S":
+			//currentPosition = makeMove(item, currentPosition)
+		case "F":
+			//item.action = currentDirection
+			//currentPosition = makeMove(item, currentPosition)
+		}
+	}
+
+	sum := 0
+	for _, value := range currentPosition {
+		sum += value
+	}
+	return sum
 }
 
 func init() {
