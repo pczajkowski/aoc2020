@@ -151,6 +151,10 @@ func navigate(sequences []sequence) int {
 	return currentPosition.north + currentPosition.south + currentPosition.east + currentPosition.west
 }
 
+func init() {
+	getDirections()
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -168,6 +172,5 @@ func main() {
 	}
 	file.Close()
 
-	getDirections()
 	fmt.Println("Part1:", navigate(sequences))
 }
