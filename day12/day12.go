@@ -56,8 +56,7 @@ func rotate(currentDirection string, item sequence) string {
 	change := 0
 
 	switch item.value {
-	case 0:
-	case 360:
+	case 0, 360:
 		return currentDirection
 	case 90:
 		change = 1
