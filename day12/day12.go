@@ -7,6 +7,10 @@ import (
 	"os"
 )
 
+const (
+	numberOfDirecrtions = 4
+)
+
 type sequence struct {
 	action string
 	value  int
@@ -36,6 +40,45 @@ func readFile(file *os.File) ([]sequence, error) {
 	return sequences, nil
 }
 
+var directions []string
+var directionsMap map[string]int
+
+func getDirections() {
+	directions = []string{"E", "S", "W", "N"}
+
+	directionsMap = make(map[string]int)
+	for index, value := range directions {
+		directionsMap[value] = index
+	}
+}
+
+func rotate(currentDirection string, item sequence) string {
+	change := 0
+
+	switch item.value {
+	case 0:
+	case 360:
+		return currentDirection
+	case 90:
+		change = 1
+	case 180:
+		change = 2
+	case 270:
+		change = 3
+	}
+
+	if item.action == "L" {
+		change = -change
+	}
+
+	newDirectionIndex := (directionsMap[currentDirection] + change) % 4
+	if newDirectionIndex < 0 {
+		newDirectionIndex = numberOfDirecrtions + newDirectionIndex
+	}
+
+	return directions[newDirectionIndex]
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -51,10 +94,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Can't read sequences!\n%s", err)
 	}
-
-	for _, item := range sequences {
-		fmt.Println(item)
-	}
-
 	file.Close()
+
+	fmt.Println(sequences)
+	getDirections()
+	fmt.Println(rotate("E", sequence{action: "L", value: 270}))
 }
