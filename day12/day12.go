@@ -79,6 +79,79 @@ func rotate(currentDirection string, item sequence) string {
 	return directions[newDirectionIndex]
 }
 
+type cooridinates struct {
+	north int
+	south int
+	east  int
+	west  int
+}
+
+func makeMove(item sequence, position cooridinates) cooridinates {
+	switch item.action {
+	case "E":
+		if position.west > 0 {
+			position.west = position.west - item.value
+			if position.west < 0 {
+				position.east -= position.west
+				position.west = 0
+			}
+		} else {
+			position.east += item.value
+		}
+	case "W":
+		if position.east > 0 {
+			position.east = position.east - item.value
+			if position.east < 0 {
+				position.west -= position.east
+				position.east = 0
+			}
+		} else {
+			position.west += item.value
+		}
+	case "N":
+		if position.south > 0 {
+			position.south = position.south - item.value
+			if position.south < 0 {
+				position.north -= position.south
+				position.south = 0
+			}
+		} else {
+			position.north += item.value
+		}
+	case "S":
+		if position.north > 0 {
+			position.north = position.north - item.value
+			if position.north < 0 {
+				position.south -= position.north
+				position.north = 0
+			}
+		} else {
+			position.south += item.value
+		}
+	}
+
+	return position
+}
+
+func navigate(sequences []sequence) int {
+	currentDirection := "E"
+	currentPosition := cooridinates{north: 0, south: 0, east: 0, west: 0}
+
+	for _, item := range sequences {
+		switch item.action {
+		case "L", "R":
+			currentDirection = rotate(currentDirection, item)
+		case "E", "W", "N", "S":
+			currentPosition = makeMove(item, currentPosition)
+		case "F":
+			item.action = currentDirection
+			currentPosition = makeMove(item, currentPosition)
+		}
+	}
+
+	return currentPosition.north + currentPosition.south + currentPosition.east + currentPosition.west
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -96,7 +169,6 @@ func main() {
 	}
 	file.Close()
 
-	fmt.Println(sequences)
 	getDirections()
-	fmt.Println(rotate("E", sequence{action: "L", value: 270}))
+	fmt.Println("Part1:", navigate(sequences))
 }
