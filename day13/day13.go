@@ -99,6 +99,46 @@ func findEarliestBus(data schedule) int64 {
 	return earliest * earliestID
 }
 
+func calculate(buses []bus) int64 {
+	num := []int64{}
+	var prod int64 = 1
+	pp := []int64{}
+	inv := []int64{}
+	rem := []int64{}
+
+	for i, current := range buses {
+		if current.id == "x" {
+			continue
+		}
+
+		num = append(num, current.idValue)
+		rem = append(rem, int64(i))
+		prod *= current.idValue
+	}
+
+	for i, _ := range num {
+		pp = append(pp, prod/num[i])
+	}
+
+	for i, _ := range num {
+		var x int64 = 1
+		for {
+			if (pp[i]*x)%num[i] == 1 {
+				inv = append(inv, x)
+				break
+			}
+			x++
+		}
+	}
+
+	var sub int64
+	for i, _ := range num {
+		sub += rem[i] * pp[i] * inv[i]
+	}
+
+	return sub % prod
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -117,4 +157,5 @@ func main() {
 
 	data = calculateTimes(data)
 	fmt.Println("Part1:", findEarliestBus(data))
+	fmt.Println("Part2:", calculate(data.buses))
 }
