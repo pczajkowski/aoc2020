@@ -63,6 +63,27 @@ func readData(file *os.File) (schedule, error) {
 	return data, nil
 }
 
+func calculateTimes(data schedule) schedule {
+	for key, _ := range data.buses {
+		data.buses[key] = key - (data.timestamp % key)
+	}
+
+	return data
+}
+
+func findEarliestBus(data schedule) int64 {
+	var earliest int64 = data.timestamp
+	var earliestID int64 = 0
+	for key, value := range data.buses {
+		if value < earliest {
+			earliest = value
+			earliestID = key
+		}
+	}
+
+	return earliest * earliestID
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -78,5 +99,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to read data: %s\n", err)
 	}
-	fmt.Println(data)
+
+	data = calculateTimes(data)
+	fmt.Println("Part1:", findEarliestBus(data))
 }
