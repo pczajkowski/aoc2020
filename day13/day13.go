@@ -84,6 +84,27 @@ func findEarliestBus(data schedule) int64 {
 	return earliest * earliestID
 }
 
+func alignBuses(data schedule) int64 {
+	var advance int64 = 1
+	var next int64 = 1
+	var current int64
+
+	for _, item := range data.buses {
+		current = next
+		for {
+			current += advance
+			if (current+item.index)%item.id == 0 {
+				next = current
+				break
+			}
+		}
+
+		advance *= item.id
+	}
+
+	return current
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -101,4 +122,5 @@ func main() {
 	}
 
 	fmt.Println("Part1:", findEarliestBus(data))
+	fmt.Println("Part2:", alignBuses(data))
 }
