@@ -9,24 +9,32 @@ import (
 	"strings"
 )
 
-type schedule struct {
-	timestamp int64
-	buses     map[int64]int64
+type bus struct {
+	id      string
+	idValue int64
+	value   int64
 }
 
-func getIDs(busesString string) (map[int64]int64, error) {
-	buses := make(map[int64]int64)
+type schedule struct {
+	timestamp int64
+	buses     []bus
+}
 
-	for _, bus := range strings.Split(busesString, ",") {
-		if bus == "x" {
-			continue
+func getIDs(busesString string) ([]bus, error) {
+	buses := []bus{}
+	for _, item := range strings.Split(busesString, ",") {
+		newBus := bus{id: item, value: 0}
+		if newBus.id == "x" {
+			newBus.idValue = 0
+		} else {
+			var err error
+			newBus.idValue, err = strconv.ParseInt(item, 10, 32)
+			if err != nil {
+				return buses, fmt.Errorf("Error parsing busID %s: %s", item, err)
+			}
 		}
 
-		busID, err := strconv.ParseInt(bus, 10, 32)
-		if err != nil {
-			return buses, fmt.Errorf("Error parsing busID %s: %s", bus, err)
-		}
-		buses[busID] = 0
+		buses = append(buses, newBus)
 	}
 
 	return buses, nil
@@ -64,8 +72,11 @@ func readData(file *os.File) (schedule, error) {
 }
 
 func calculateTimes(data schedule) schedule {
-	for key, _ := range data.buses {
-		data.buses[key] = key - (data.timestamp % key)
+	for i, item := range data.buses {
+		if item.id == "x" {
+			continue
+		}
+		data.buses[i].value = item.idValue - (data.timestamp % item.idValue)
 	}
 
 	return data
@@ -74,10 +85,14 @@ func calculateTimes(data schedule) schedule {
 func findEarliestBus(data schedule) int64 {
 	var earliest int64 = data.timestamp
 	var earliestID int64 = 0
-	for key, value := range data.buses {
-		if value < earliest {
-			earliest = value
-			earliestID = key
+	for _, item := range data.buses {
+		if item.value < earliest {
+			if item.id == "x" {
+				continue
+			}
+
+			earliest = item.value
+			earliestID = item.idValue
 		}
 	}
 
