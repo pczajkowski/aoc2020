@@ -10,9 +10,8 @@ import (
 )
 
 type bus struct {
-	id      string
-	idValue int64
-	value   int64
+	id    int64
+	index int64
 }
 
 type schedule struct {
@@ -22,19 +21,18 @@ type schedule struct {
 
 func getIDs(busesString string) ([]bus, error) {
 	buses := []bus{}
+	var index int64 = 0
 	for _, item := range strings.Split(busesString, ",") {
-		newBus := bus{id: item, value: 0}
-		if newBus.id == "x" {
-			newBus.idValue = 0
-		} else {
-			var err error
-			newBus.idValue, err = strconv.ParseInt(item, 10, 32)
+		if item != "x" {
+			id, err := strconv.ParseInt(item, 10, 32)
 			if err != nil {
 				return buses, fmt.Errorf("Error parsing busID %s: %s", item, err)
 			}
+			newBus := bus{id: id, index: index}
+			buses = append(buses, newBus)
 		}
 
-		buses = append(buses, newBus)
+		index++
 	}
 
 	return buses, nil
@@ -71,72 +69,19 @@ func readData(file *os.File) (schedule, error) {
 	return data, nil
 }
 
-func calculateTimes(data schedule) schedule {
-	for i, item := range data.buses {
-		if item.id == "x" {
-			continue
-		}
-		data.buses[i].value = item.idValue - (data.timestamp % item.idValue)
-	}
-
-	return data
-}
-
 func findEarliestBus(data schedule) int64 {
 	var earliest int64 = data.timestamp
 	var earliestID int64 = 0
 	for _, item := range data.buses {
-		if item.value < earliest {
-			if item.id == "x" {
-				continue
-			}
+		value := item.id - (data.timestamp % item.id)
+		if value < earliest {
 
-			earliest = item.value
-			earliestID = item.idValue
+			earliest = value
+			earliestID = item.id
 		}
 	}
 
 	return earliest * earliestID
-}
-
-func calculate(buses []bus) int64 {
-	num := []int64{}
-	var prod int64 = 1
-	pp := []int64{}
-	inv := []int64{}
-	rem := []int64{}
-
-	for i, current := range buses {
-		if current.id == "x" {
-			continue
-		}
-
-		num = append(num, current.idValue)
-		rem = append(rem, int64(i))
-		prod *= current.idValue
-	}
-
-	for i, _ := range num {
-		pp = append(pp, prod/num[i])
-	}
-
-	for i, _ := range num {
-		var x int64 = 1
-		for {
-			if (pp[i]*x)%num[i] == 1 {
-				inv = append(inv, x)
-				break
-			}
-			x++
-		}
-	}
-
-	var sub int64
-	for i, _ := range num {
-		sub += rem[i] * pp[i] * inv[i]
-	}
-
-	return sub % prod
 }
 
 func main() {
@@ -155,7 +100,5 @@ func main() {
 		log.Fatalf("Failed to read data: %s\n", err)
 	}
 
-	data = calculateTimes(data)
 	fmt.Println("Part1:", findEarliestBus(data))
-	fmt.Println("Part2:", calculate(data.buses))
 }
