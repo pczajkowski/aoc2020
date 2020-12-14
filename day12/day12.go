@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	numberOfDirecrtions = 4
+	numberOfDirections = 4
 )
 
 type sequence struct {
@@ -79,15 +79,15 @@ func rotate(currentDirection string, item sequence) string {
 
 	newDirectionIndex := (directionsMap[currentDirection] + change) % 4
 	if newDirectionIndex < 0 {
-		newDirectionIndex = numberOfDirecrtions + newDirectionIndex
+		newDirectionIndex = numberOfDirections + newDirectionIndex
 	}
 
 	return directions[newDirectionIndex]
 }
 
-type cooridinates map[string]int
+type coordinates map[string]int
 
-func makeMove(item sequence, position cooridinates) cooridinates {
+func makeMove(item sequence, position coordinates) coordinates {
 	opposite := opposites[item.action]
 	if position[opposite] > 0 {
 		position[opposite] = position[opposite] - item.value
@@ -104,7 +104,7 @@ func makeMove(item sequence, position cooridinates) cooridinates {
 
 func navigate(sequences []sequence) int {
 	currentDirection := "E"
-	currentPosition := make(cooridinates)
+	currentPosition := make(coordinates)
 	currentPosition["E"] = 0
 	currentPosition["W"] = 0
 	currentPosition["N"] = 0
@@ -129,8 +129,8 @@ func navigate(sequences []sequence) int {
 	return sum
 }
 
-func rotateWaypoint(waypoint cooridinates, item sequence) cooridinates {
-	newWaypoint := make(cooridinates)
+func rotateWaypoint(waypoint coordinates, item sequence) coordinates {
+	newWaypoint := make(coordinates)
 
 	for key, value := range waypoint {
 		newKey := rotate(key, item)
@@ -141,13 +141,13 @@ func rotateWaypoint(waypoint cooridinates, item sequence) cooridinates {
 }
 
 func navigate2(sequences []sequence) int {
-	currentPosition := make(cooridinates)
+	currentPosition := make(coordinates)
 	currentPosition["E"] = 0
 	currentPosition["W"] = 0
 	currentPosition["N"] = 0
 	currentPosition["S"] = 0
 
-	currentWaypoint := make(cooridinates)
+	currentWaypoint := make(coordinates)
 	currentWaypoint["E"] = 10
 	currentWaypoint["W"] = 0
 	currentWaypoint["N"] = 1
@@ -192,7 +192,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("Can't read sequences!\n%s", err)
 	}
-	file.Close()
+
+	if err := file.Close(); err != nil {
+		log.Fatalf("Failed to close file: %s", err)
+	}
 
 	fmt.Println("Part1:", navigate(sequences))
 	fmt.Println("Part2:", navigate2(sequences))
