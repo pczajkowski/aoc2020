@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -72,16 +73,14 @@ func readFile(file *os.File) {
 	}
 }
 
-func sum() int64 {
+func sum(memory map[int64]int64) int64 {
 	var sum int64
-	for _, value := range mem {
+	for _, value := range memory {
 		sum += value
 	}
 
 	return sum
 }
-
-var masks []string
 
 func permuteMask(index int64, masksSoFar []string) []string {
 	if index < 0 {
@@ -107,16 +106,31 @@ func permuteMask(index int64, masksSoFar []string) []string {
 	return permuteMask(index-1, newMasks)
 }
 
+func setBitsString(number string) string {
+	newNumber := []byte(number)
+	for i := 0; i <= maskMaxIndex; i++ {
+		switch mask2[i] {
+		case 'X':
+			newNumber[i] = 'X'
+		case '1':
+			newNumber[i] = '1'
+		case '0':
+			continue
+		}
+	}
+
+	return string(newNumber)
+}
+
+var mem2 map[int64]int64
+var mask2 string
+
 func processLine2(line string) error {
 	if strings.Contains(line, "mask") {
-		var currentMask string
-		n, err := fmt.Sscanf(line, "mask = %s\n", &currentMask)
+		n, err := fmt.Sscanf(line, "mask = %s\n", &mask2)
 		if err != nil || n != 1 {
 			return fmt.Errorf("Error scanning '%s': %s", line, err)
 		}
-
-		masks = permuteMask(maskMaxIndex, []string{currentMask})
-		fmt.Println(masks)
 
 		return nil
 	}
@@ -128,8 +142,17 @@ func processLine2(line string) error {
 		return fmt.Errorf("Error scanning '%s': %s", line, err)
 	}
 
-	number = setBits(number, mask)
-	mem[id] = number
+	numberString := fmt.Sprintf("%036b", id)
+	result := setBitsString(numberString)
+	masks := permuteMask(maskMaxIndex, []string{result})
+	for _, currentMask := range masks {
+		currentID, err := strconv.ParseInt(currentMask, 2, 64)
+		if err != nil {
+			return fmt.Errorf("Error parsing timestamp %s: %s", currentMask, err)
+		}
+
+		mem2[currentID] = number
+	}
 
 	return nil
 }
@@ -153,6 +176,7 @@ func readFile2(file *os.File) {
 
 func init() {
 	mem = make(map[int64]int64)
+	mem2 = make(map[int64]int64)
 }
 
 func main() {
@@ -168,7 +192,7 @@ func main() {
 	}
 
 	readFile(file)
-	fmt.Println("Part1:", sum())
+	fmt.Println("Part1:", sum(mem))
 	if err := file.Close(); err != nil {
 		log.Fatalf("Failed to close file: %s", err)
 	}
@@ -180,8 +204,8 @@ func main() {
 	}
 
 	readFile2(file)
-
 	if err := file.Close(); err != nil {
 		log.Fatalf("Failed to close file: %s", err)
 	}
+	fmt.Println("Part2:", sum(mem2))
 }
