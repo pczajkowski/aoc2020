@@ -67,6 +67,11 @@ func readFile(file *os.File) {
 		if err := processLine(line); err != nil {
 			log.Fatal(err)
 		}
+
+		if err := processLine2(line); err != nil {
+			log.Fatal(err)
+		}
+
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Scanner error: %s", err)
@@ -157,23 +162,6 @@ func processLine2(line string) error {
 	return nil
 }
 
-func readFile2(file *os.File) {
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" {
-			break
-		}
-
-		if err := processLine2(line); err != nil {
-			log.Fatal(err)
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		log.Fatalf("Scanner error: %s", err)
-	}
-}
-
 func init() {
 	mem = make(map[int64]int64)
 	mem2 = make(map[int64]int64)
@@ -192,20 +180,10 @@ func main() {
 	}
 
 	readFile(file)
+	if err := file.Close(); err != nil {
+		log.Fatalf("Failed to close file: %s", err)
+	}
+
 	fmt.Println("Part1:", sum(mem))
-	if err := file.Close(); err != nil {
-		log.Fatalf("Failed to close file: %s", err)
-	}
-
-	file, err = os.Open(filePath)
-	if err != nil {
-		log.Fatalf("Failed to open %s!\n", filePath)
-
-	}
-
-	readFile2(file)
-	if err := file.Close(); err != nil {
-		log.Fatalf("Failed to close file: %s", err)
-	}
 	fmt.Println("Part2:", sum(mem2))
 }
