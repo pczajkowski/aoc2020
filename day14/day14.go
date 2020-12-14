@@ -34,15 +34,6 @@ func setBits(number int64, mask string) int64 {
 }
 
 func processLine(line string) error {
-	if strings.Contains(line, "mask") {
-		n, err := fmt.Sscanf(line, "mask = %s\n", &mask)
-		if err != nil || n != 1 {
-			return fmt.Errorf("Error scanning '%s': %s", line, err)
-		}
-
-		return nil
-	}
-
 	var id int64
 	var number int64
 	n, err := fmt.Sscanf(line, "mem[%d] = %d", &id, &number)
@@ -62,6 +53,15 @@ func readFile(file *os.File) {
 		line := scanner.Text()
 		if line == "" {
 			break
+		}
+
+		if strings.Contains(line, "mask") {
+			n, err := fmt.Sscanf(line, "mask = %s\n", &mask)
+			if err != nil || n != 1 {
+				log.Fatalf("Error scanning '%s': %s", line, err)
+			}
+
+			continue
 		}
 
 		if err := processLine(line); err != nil {
@@ -130,10 +130,6 @@ func setBitsString(number string) string {
 var mem2 map[int64]int64
 
 func processLine2(line string) error {
-	if strings.Contains(line, "mask") {
-		return nil
-	}
-
 	var id int64
 	var number int64
 	n, err := fmt.Sscanf(line, "mem[%d] = %d", &id, &number)
