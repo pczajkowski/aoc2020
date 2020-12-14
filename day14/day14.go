@@ -114,7 +114,7 @@ func permuteMask(index int64, masksSoFar []string) []string {
 func setBitsString(number string) string {
 	newNumber := []byte(number)
 	for i := 0; i <= maskMaxIndex; i++ {
-		switch mask2[i] {
+		switch mask[i] {
 		case 'X':
 			newNumber[i] = 'X'
 		case '1':
@@ -128,15 +128,9 @@ func setBitsString(number string) string {
 }
 
 var mem2 map[int64]int64
-var mask2 string
 
 func processLine2(line string) error {
 	if strings.Contains(line, "mask") {
-		n, err := fmt.Sscanf(line, "mask = %s\n", &mask2)
-		if err != nil || n != 1 {
-			return fmt.Errorf("Error scanning '%s': %s", line, err)
-		}
-
 		return nil
 	}
 
