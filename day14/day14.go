@@ -81,6 +81,76 @@ func sum() int64 {
 	return sum
 }
 
+var masks []string
+
+func permuteMask(index int64, masksSoFar []string) []string {
+	if index < 0 {
+		return masksSoFar
+	}
+
+	var newMasks []string
+	for _, mask := range masksSoFar {
+		if mask[index] != 'X' {
+			newMasks = append(newMasks, mask)
+			continue
+		}
+
+		newMask1 := []byte(mask)
+		newMask1[index] = '1'
+		newMasks = append(newMasks, string(newMask1))
+
+		newMask2 := []byte(mask)
+		newMask2[index] = '0'
+		newMasks = append(newMasks, string(newMask2))
+	}
+
+	return permuteMask(index-1, newMasks)
+}
+
+func processLine2(line string) error {
+	if strings.Contains(line, "mask") {
+		var currentMask string
+		n, err := fmt.Sscanf(line, "mask = %s\n", &currentMask)
+		if err != nil || n != 1 {
+			return fmt.Errorf("Error scanning '%s': %s", line, err)
+		}
+
+		masks = permuteMask(maskMaxIndex, []string{currentMask})
+		fmt.Println(masks)
+
+		return nil
+	}
+
+	var id int64
+	var number int64
+	n, err := fmt.Sscanf(line, "mem[%d] = %d", &id, &number)
+	if err != nil || n != 2 {
+		return fmt.Errorf("Error scanning '%s': %s", line, err)
+	}
+
+	number = setBits(number, mask)
+	mem[id] = number
+
+	return nil
+}
+
+func readFile2(file *os.File) {
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			break
+		}
+
+		if err := processLine2(line); err != nil {
+			log.Fatal(err)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("Scanner error: %s", err)
+	}
+}
+
 func init() {
 	mem = make(map[int64]int64)
 }
@@ -90,16 +160,28 @@ func main() {
 		log.Fatal("You need to specify a file!")
 	}
 
-	file, err := os.Open(os.Args[1])
+	filePath := os.Args[1]
+	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatalf("Failed to open %s!\n", os.Args[1])
+		log.Fatalf("Failed to open %s!\n", filePath)
 
 	}
 
 	readFile(file)
+	fmt.Println("Part1:", sum())
 	if err := file.Close(); err != nil {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	fmt.Println("Part1:", sum())
+	file, err = os.Open(filePath)
+	if err != nil {
+		log.Fatalf("Failed to open %s!\n", filePath)
+
+	}
+
+	readFile2(file)
+
+	if err := file.Close(); err != nil {
+		log.Fatalf("Failed to close file: %s", err)
+	}
 }
