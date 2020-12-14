@@ -72,6 +72,15 @@ func readFile(file *os.File) {
 	}
 }
 
+func sum() int64 {
+	var sum int64
+	for _, value := range mem {
+		sum += value
+	}
+
+	return sum
+}
+
 func init() {
 	mem = make(map[int64]int64)
 }
@@ -92,5 +101,5 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	fmt.Println(mem)
+	fmt.Println("Part1:", sum())
 }
