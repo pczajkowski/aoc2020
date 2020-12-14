@@ -121,6 +121,10 @@ func main() {
 		log.Fatalf("Failed to read data: %s\n", err)
 	}
 
+	if err := file.Close(); err != nil {
+		log.Fatalf("Failed to close file: %s\n", err)
+	}
+
 	fmt.Println("Part1:", findEarliestBus(data))
 	fmt.Println("Part2:", alignBuses(data))
 }
