@@ -128,7 +128,7 @@ func processLine2(id int64, number int64) error {
 	for _, currentMask := range masks {
 		currentID, err := strconv.ParseInt(currentMask, 2, 64)
 		if err != nil {
-			return fmt.Errorf("Error parsing timestamp %s: %s", currentMask, err)
+			return fmt.Errorf("Error parsing current ID %s: %s", currentMask, err)
 		}
 
 		mem2[currentID] = number
