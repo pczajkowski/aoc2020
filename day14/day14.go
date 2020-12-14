@@ -33,18 +33,9 @@ func setBits(number int64, mask string) int64 {
 	return number
 }
 
-func processLine(line string) error {
-	var id int64
-	var number int64
-	n, err := fmt.Sscanf(line, "mem[%d] = %d", &id, &number)
-	if err != nil || n != 2 {
-		return fmt.Errorf("Error scanning '%s': %s", line, err)
-	}
-
+func processLine(id int64, number int64) {
 	number = setBits(number, mask)
 	mem[id] = number
-
-	return nil
 }
 
 func readFile(file *os.File) {
@@ -64,14 +55,15 @@ func readFile(file *os.File) {
 			continue
 		}
 
-		if err := processLine(line); err != nil {
-			log.Fatal(err)
+		var id int64
+		var number int64
+		n, err := fmt.Sscanf(line, "mem[%d] = %d", &id, &number)
+		if err != nil || n != 2 {
+			log.Fatalf("Error scanning '%s': %s", line, err)
 		}
 
-		if err := processLine2(line); err != nil {
-			log.Fatal(err)
-		}
-
+		processLine(id, number)
+		processLine2(id, number)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Scanner error: %s", err)
@@ -129,14 +121,7 @@ func setBitsString(number string) string {
 
 var mem2 map[int64]int64
 
-func processLine2(line string) error {
-	var id int64
-	var number int64
-	n, err := fmt.Sscanf(line, "mem[%d] = %d", &id, &number)
-	if err != nil || n != 2 {
-		return fmt.Errorf("Error scanning '%s': %s", line, err)
-	}
-
+func processLine2(id int64, number int64) error {
 	numberString := fmt.Sprintf("%036b", id)
 	result := setBitsString(numberString)
 	masks := permuteMask(maskMaxIndex, []string{result})
