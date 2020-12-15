@@ -34,7 +34,7 @@ func playGame(limit int) int {
 			currentNumber = rounds[1]
 		} else {
 			if spoken[1] == 0 {
-				currentNumber = rounds[1]
+				currentNumber = 0
 
 			} else {
 				currentNumber = spoken[1] - spoken[0]
