@@ -8,18 +8,15 @@ import (
 	"strings"
 )
 
-type numberSpoken struct {
-	number int
-	rounds []int
-}
+var rounds map[int]int
+var numbersSpoken map[int][]int
 
-func readFile(filePath string) []numberSpoken {
+func readFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var numbersSpoken []numberSpoken
 	for i, item := range strings.Split(string(content), ",") {
 		var number int
 		n, err := fmt.Sscanf(item, "%d", &number)
@@ -27,10 +24,14 @@ func readFile(filePath string) []numberSpoken {
 			log.Fatal(err)
 		}
 
-		numbersSpoken = append(numbersSpoken, numberSpoken{number: number, rounds: []int{i + 1}})
+		rounds[i+1] = number
+		numbersSpoken[number] = []int{i + 1}
 	}
+}
 
-	return numbersSpoken
+func init() {
+	rounds = make(map[int]int)
+	numbersSpoken = make(map[int][]int)
 }
 
 func main() {
@@ -38,6 +39,6 @@ func main() {
 		log.Fatal("You need to specify a file!")
 	}
 
-	numbersSpoken := readFile(os.Args[1])
-	fmt.Println(numbersSpoken)
+	readFile(os.Args[1])
+	fmt.Println(numbersSpoken, rounds)
 }
