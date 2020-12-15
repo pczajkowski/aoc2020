@@ -9,7 +9,7 @@ import (
 )
 
 var rounds map[int]int
-var numbersSpoken map[int][]int
+var numbersSpoken map[int][2]int
 
 func readFile(filePath string) {
 	content, err := ioutil.ReadFile(filePath)
@@ -25,13 +25,47 @@ func readFile(filePath string) {
 		}
 
 		rounds[i+1] = number
-		numbersSpoken[number] = []int{i + 1}
+		numbersSpoken[number] = [2]int{i + 1, 0}
 	}
+}
+
+func playGame(limit int) int {
+	currentRound := len(rounds) + 1
+
+	var currentNumber int
+	for ; currentRound <= limit; currentRound++ {
+		lastNumber := rounds[currentRound-1]
+
+		if spoken, ok := numbersSpoken[lastNumber]; !ok {
+			currentNumber = rounds[1]
+		} else {
+			if spoken[1] == 0 {
+				currentNumber = rounds[1]
+
+			} else {
+				currentNumber = spoken[1] - spoken[0]
+			}
+		}
+
+		rounds[currentRound] = currentNumber
+
+		if _, ok := numbersSpoken[currentNumber]; !ok {
+			numbersSpoken[currentNumber] = [2]int{currentRound, 0}
+		} else {
+			if numbersSpoken[currentNumber][1] == 0 {
+				numbersSpoken[currentNumber] = [2]int{numbersSpoken[currentNumber][0], currentRound}
+			} else {
+				numbersSpoken[currentNumber] = [2]int{numbersSpoken[currentNumber][1], currentRound}
+			}
+		}
+	}
+
+	return currentNumber
 }
 
 func init() {
 	rounds = make(map[int]int)
-	numbersSpoken = make(map[int][]int)
+	numbersSpoken = make(map[int][2]int)
 }
 
 func main() {
@@ -40,5 +74,5 @@ func main() {
 	}
 
 	readFile(os.Args[1])
-	fmt.Println(numbersSpoken, rounds)
+	fmt.Println(playGame(2020))
 }
