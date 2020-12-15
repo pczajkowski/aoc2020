@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -11,13 +10,8 @@ import (
 var rounds map[int]int
 var numbersSpoken map[int][2]int
 
-func readFile(filePath string) {
-	content, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for i, item := range strings.Split(string(content), ",") {
+func readNumbers(startingNumbers string) {
+	for i, item := range strings.Split(string(startingNumbers), ",") {
 		var number int
 		n, err := fmt.Sscanf(item, "%d", &number)
 		if err != nil || n < 1 {
@@ -70,9 +64,9 @@ func init() {
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("You need to specify a file!")
+		log.Fatal("You need to specify starting numbers!")
 	}
 
-	readFile(os.Args[1])
+	readNumbers(os.Args[1])
 	fmt.Println(playGame(2020))
 }
