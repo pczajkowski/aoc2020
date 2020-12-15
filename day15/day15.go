@@ -7,10 +7,9 @@ import (
 	"strings"
 )
 
-var lastNumber int
-var numbersSpoken map[int][2]int
-
-func readNumbers(startingNumbers string) {
+func readNumbers(startingNumbers string) (int, map[int][2]int) {
+	lastNumber := 0
+	numbersSpoken := make(map[int][2]int)
 	for i, item := range strings.Split(string(startingNumbers), ",") {
 		var number int
 		n, err := fmt.Sscanf(item, "%d", &number)
@@ -21,9 +20,11 @@ func readNumbers(startingNumbers string) {
 		lastNumber = number
 		numbersSpoken[number] = [2]int{i + 1, 0}
 	}
+
+	return lastNumber, numbersSpoken
 }
 
-func playGame(currentRound, end int) int {
+func playGame(currentRound, end, lastNumber int, numbersSpoken map[int][2]int) (int, map[int][2]int) {
 	var currentNumber int
 	for ; currentRound <= end; currentRound++ {
 		if spoken, ok := numbersSpoken[lastNumber]; !ok {
@@ -50,11 +51,7 @@ func playGame(currentRound, end int) int {
 		lastNumber = currentNumber
 	}
 
-	return currentNumber
-}
-
-func init() {
-	numbersSpoken = make(map[int][2]int)
+	return currentNumber, numbersSpoken
 }
 
 func main() {
@@ -62,7 +59,10 @@ func main() {
 		log.Fatal("You need to specify starting numbers!")
 	}
 
-	readNumbers(os.Args[1])
-	fmt.Println("Part1:", playGame(len(numbersSpoken)+1, 2020))
-	fmt.Println("Part2:", playGame(2021, 30000000))
+	lastNumber, numbersSpoken := readNumbers(os.Args[1])
+	lastNumber, numbersSpoken = playGame(len(numbersSpoken)+1, 2020, lastNumber, numbersSpoken)
+	fmt.Println("Part1:", lastNumber)
+
+	lastNumber, numbersSpoken = playGame(2021, 30000000, lastNumber, numbersSpoken)
+	fmt.Println("Part2:", lastNumber)
 }
