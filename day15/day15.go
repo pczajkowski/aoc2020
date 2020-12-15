@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var rounds map[int]int
+var lastNumber int
 var numbersSpoken map[int][2]int
 
 func readNumbers(startingNumbers string) {
@@ -18,18 +18,14 @@ func readNumbers(startingNumbers string) {
 			log.Fatal(err)
 		}
 
-		rounds[i+1] = number
+		lastNumber = number
 		numbersSpoken[number] = [2]int{i + 1, 0}
 	}
 }
 
-func playGame(limit int) int {
-	currentRound := len(rounds) + 1
-
+func playGame(currentRound, end int) int {
 	var currentNumber int
-	for ; currentRound <= limit; currentRound++ {
-		lastNumber := rounds[currentRound-1]
-
+	for ; currentRound <= end; currentRound++ {
 		if spoken, ok := numbersSpoken[lastNumber]; !ok {
 			currentNumber = 0
 		} else {
@@ -41,8 +37,6 @@ func playGame(limit int) int {
 			}
 		}
 
-		rounds[currentRound] = currentNumber
-
 		if _, ok := numbersSpoken[currentNumber]; !ok {
 			numbersSpoken[currentNumber] = [2]int{currentRound, 0}
 		} else {
@@ -52,13 +46,14 @@ func playGame(limit int) int {
 				numbersSpoken[currentNumber] = [2]int{numbersSpoken[currentNumber][1], currentRound}
 			}
 		}
+
+		lastNumber = currentNumber
 	}
 
 	return currentNumber
 }
 
 func init() {
-	rounds = make(map[int]int)
 	numbersSpoken = make(map[int][2]int)
 }
 
@@ -68,6 +63,6 @@ func main() {
 	}
 
 	readNumbers(os.Args[1])
-	fmt.Println("Part1:", playGame(2020))
-	fmt.Println("Part2:", playGame(30000000))
+	fmt.Println("Part1:", playGame(len(numbersSpoken)+1, 2020))
+	fmt.Println("Part2:", playGame(2021, 30000000))
 }
