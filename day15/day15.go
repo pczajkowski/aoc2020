@@ -31,7 +31,7 @@ func playGame(limit int) int {
 		lastNumber := rounds[currentRound-1]
 
 		if spoken, ok := numbersSpoken[lastNumber]; !ok {
-			currentNumber = rounds[1]
+			currentNumber = 0
 		} else {
 			if spoken[1] == 0 {
 				currentNumber = 0
