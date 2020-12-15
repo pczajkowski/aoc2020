@@ -68,5 +68,5 @@ func main() {
 	}
 
 	readNumbers(os.Args[1])
-	fmt.Println(playGame(2020))
+	fmt.Println("Part1:", playGame(2020))
 }
