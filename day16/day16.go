@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -118,27 +119,25 @@ func checkRuleOnField(currentRule rule, field int) bool {
 	return false
 }
 
-var fieldsAndRules []int
-
-func ruleTaken(ruleID int) bool {
-	for _, item := range fieldsAndRules {
-		if item == ruleID {
-			return true
-		}
-	}
-
-	return false
+type fieldRule struct {
+	id    int
+	size  int
+	rules []rule
 }
 
-func establishOrder() bool {
+type bySize []fieldRule
+
+func (a bySize) Len() int           { return len(a) }
+func (a bySize) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a bySize) Less(i, j int) bool { return a[i].size < a[j].size }
+
+func establishOrder() {
 	numberOfFields := len(rules)
+	var rulesByField []fieldRule
 
 	for i := 0; i < numberOfFields; i++ {
-		for j, currentRule := range rules {
-			if ruleTaken(j) {
-				continue
-			}
-
+		current := fieldRule{id: i, size: 0}
+		for _, currentRule := range rules {
 			ruleValid := true
 			for _, item := range validTickets {
 				if !checkRuleOnField(currentRule, item[i]) {
@@ -148,28 +147,17 @@ func establishOrder() bool {
 			}
 
 			if ruleValid {
-				fieldsAndRules = append(fieldsAndRules, j)
-				break
+				current.rules = append(current.rules, currentRule)
+				current.size++
 			}
 		}
+		rulesByField = append(rulesByField, current)
 	}
 
-	return len(fieldsAndRules) == numberOfFields
-}
-
-func checkMyTicket() int {
-	myTicket := tickets[0]
-
-	result := 1
-	for i, ruleID := range fieldsAndRules {
-		if !strings.Contains(rules[ruleID].name, "departure") {
-			continue
-		}
-
-		result *= myTicket[i]
+	sort.Sort(bySize(rulesByField))
+	for _, item := range rulesByField {
+		fmt.Println(item)
 	}
-
-	return result
 }
 
 func main() {
@@ -190,10 +178,6 @@ func main() {
 	}
 
 	fmt.Println("Part1:", sumBad())
-	fmt.Println(len(tickets), len(validTickets))
 
-	if !establishOrder() {
-		log.Fatal("No order!")
-	}
-	fmt.Println("Part2:", checkMyTicket())
+	establishOrder()
 }
