@@ -122,7 +122,7 @@ func checkRuleOnField(currentRule rule, field int) bool {
 type fieldRules struct {
 	id    int
 	size  int
-	rules []rule
+	rules []string
 }
 
 type bySize []fieldRules
@@ -133,7 +133,7 @@ func (a bySize) Less(i, j int) bool { return a[i].size < a[j].size }
 
 type fieldRule struct {
 	id         int
-	mappedRule rule
+	mappedRule string
 }
 
 var mapping []fieldRule
@@ -142,7 +142,7 @@ func notTaken(item fieldRules) {
 	for _, currentRule := range item.rules {
 		new := true
 		for _, takenRule := range mapping {
-			if currentRule.name == takenRule.mappedRule.name {
+			if currentRule == takenRule.mappedRule {
 				new = false
 				break
 			}
@@ -158,21 +158,29 @@ func notTaken(item fieldRules) {
 
 func establishOrder() {
 	numberOfFields := len(rules)
+	numberOfValidTickets := len(validTickets)
 	var rulesByField []fieldRules
 
-	for i := 0; i < numberOfFields; i++ {
-		current := fieldRules{id: i, size: 0}
-		for _, currentRule := range rules {
-			ruleValid := true
-			for _, item := range validTickets {
-				if !checkRuleOnField(currentRule, item[i]) {
-					ruleValid = false
-					break
+	validForField := make([]map[string]int, numberOfFields)
+	for i, _ := range validForField {
+		validForField[i] = make(map[string]int)
+	}
+
+	for _, item := range validTickets {
+		for i := 0; i < numberOfFields; i++ {
+			for _, currentRule := range rules {
+				if checkRuleOnField(currentRule, item[i]) {
+					validForField[i][currentRule.name]++
 				}
 			}
+		}
+	}
 
-			if ruleValid {
-				current.rules = append(current.rules, currentRule)
+	for i, item := range validForField {
+		current := fieldRules{id: i, size: 0}
+		for key, value := range item {
+			if value == numberOfValidTickets {
+				current.rules = append(current.rules, key)
 				current.size++
 			}
 		}
@@ -190,7 +198,7 @@ func checkMyTicket() int {
 
 	result := 1
 	for _, currentRule := range mapping {
-		if !strings.Contains(currentRule.mappedRule.name, "departure") {
+		if !strings.Contains(currentRule.mappedRule, "departure") {
 			continue
 		}
 
