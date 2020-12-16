@@ -19,22 +19,28 @@ var rules []rule
 
 func readRule(line string) {
 	var newRule rule
-	n, err := fmt.Sscanf(line, "%s %d-%d or %d-%d\n", &newRule.name, &newRule.firstSegment[0], &newRule.firstSegment[1], &newRule.secondSegment[0], &newRule.secondSegment[1])
-	if err != nil || n != 5 {
+	parts := strings.Split(line, ":")
+	if len(parts) != 2 {
+		log.Fatalf("Invalid line: %s", line)
+	}
+
+	newRule.name = parts[0]
+	n, err := fmt.Sscanf(parts[1], "%d-%d or %d-%d\n", &newRule.firstSegment[0], &newRule.firstSegment[1], &newRule.secondSegment[0], &newRule.secondSegment[1])
+	if err != nil || n != 4 {
 		log.Fatalf("Error scanning '%s': %s", line, err)
 	}
 
 	rules = append(rules, newRule)
 }
 
-type ticket []int64
+type ticket []int
 
 var tickets []ticket
 
 func readTicket(line string) {
 	var newTicket ticket
 	for _, item := range strings.Split(line, ",") {
-		field, err := strconv.ParseInt(item, 10, 32)
+		field, err := strconv.Atoi(item)
 		if err != nil {
 			log.Fatalf("Error parsing field from %s: %s", item, err)
 		}
@@ -70,6 +76,31 @@ func readFile(file *os.File) {
 	}
 }
 
+func checkAllRulesOnField(field int) bool {
+	for _, currentRule := range rules {
+		if (field >= currentRule.firstSegment[0] && field <= currentRule.firstSegment[1]) || (field >= currentRule.secondSegment[0] && field <= currentRule.secondSegment[1]) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func sumBad() int {
+	numberOfTickets := len(tickets)
+	sum := 0
+
+	for i := 1; i < numberOfTickets; i++ {
+		for _, field := range tickets[i] {
+			if !checkAllRulesOnField(field) {
+				sum += field
+			}
+		}
+	}
+
+	return sum
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -87,6 +118,5 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	fmt.Println(rules)
-	fmt.Println(tickets)
+	fmt.Println("Part1:", sumBad())
 }
