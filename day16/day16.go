@@ -119,24 +119,49 @@ func checkRuleOnField(currentRule rule, field int) bool {
 	return false
 }
 
-type fieldRule struct {
+type fieldRules struct {
 	id    int
 	size  int
 	rules []rule
 }
 
-type bySize []fieldRule
+type bySize []fieldRules
 
 func (a bySize) Len() int           { return len(a) }
 func (a bySize) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a bySize) Less(i, j int) bool { return a[i].size < a[j].size }
 
+type fieldRule struct {
+	id         int
+	mappedRule rule
+}
+
+var mapping []fieldRule
+
+func notTaken(item fieldRules) {
+	for _, currentRule := range item.rules {
+		new := true
+		for _, takenRule := range mapping {
+			if currentRule.name == takenRule.mappedRule.name {
+				new = false
+				break
+			}
+
+		}
+		if new {
+			newMapping := fieldRule{id: item.id, mappedRule: currentRule}
+			mapping = append(mapping, newMapping)
+			break
+		}
+	}
+}
+
 func establishOrder() {
 	numberOfFields := len(rules)
-	var rulesByField []fieldRule
+	var rulesByField []fieldRules
 
 	for i := 0; i < numberOfFields; i++ {
-		current := fieldRule{id: i, size: 0}
+		current := fieldRules{id: i, size: 0}
 		for _, currentRule := range rules {
 			ruleValid := true
 			for _, item := range validTickets {
@@ -156,8 +181,23 @@ func establishOrder() {
 
 	sort.Sort(bySize(rulesByField))
 	for _, item := range rulesByField {
-		fmt.Println(item)
+		notTaken(item)
 	}
+}
+
+func checkMyTicket() int {
+	myTicket := tickets[0]
+
+	result := 1
+	for _, currentRule := range mapping {
+		if !strings.Contains(currentRule.mappedRule.name, "departure") {
+			continue
+		}
+
+		result *= myTicket[currentRule.id]
+	}
+
+	return result
 }
 
 func main() {
@@ -180,4 +220,5 @@ func main() {
 	fmt.Println("Part1:", sumBad())
 
 	establishOrder()
+	fmt.Println("Part2:", checkMyTicket())
 }
