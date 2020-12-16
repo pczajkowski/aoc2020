@@ -109,6 +109,68 @@ func sumBad() int {
 	return sum
 }
 
+func checkRuleOnField(currentRule rule, field int) bool {
+	if (field >= currentRule.firstSegment[0] && field <= currentRule.firstSegment[1]) || (field >= currentRule.secondSegment[0] && field <= currentRule.secondSegment[1]) {
+		return true
+	}
+
+	return false
+}
+
+var fieldsAndRules []int
+
+func ruleTaken(ruleID int) bool {
+	for _, item := range fieldsAndRules {
+		if item == ruleID {
+			return true
+		}
+	}
+
+	return false
+}
+
+func establishOrder() {
+	numberOfFields := len(validTickets[0])
+	numberOfRules := len(rules)
+
+	for i := 0; i < numberOfFields; i++ {
+		j := 0
+		for ; j < numberOfRules; j++ {
+			if ruleTaken(j) {
+				continue
+			}
+
+			ruleValid := true
+			for _, item := range validTickets {
+				if !checkRuleOnField(rules[j], item[i]) {
+					ruleValid = false
+					break
+				}
+			}
+
+			if ruleValid {
+				fieldsAndRules = append(fieldsAndRules, j)
+				break
+			}
+		}
+	}
+}
+
+func checkMyTicket() int {
+	myTicket := tickets[0]
+
+	result := 1
+	for i, ruleID := range fieldsAndRules {
+		if !strings.Contains(rules[ruleID].name, "departure") {
+			continue
+		}
+
+		result *= myTicket[i]
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -127,5 +189,7 @@ func main() {
 	}
 
 	fmt.Println("Part1:", sumBad())
-	fmt.Println(validTickets)
+
+	establishOrder()
+	fmt.Println("Part2:", checkMyTicket())
 }
