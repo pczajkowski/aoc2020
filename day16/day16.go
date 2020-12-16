@@ -86,15 +86,23 @@ func checkAllRulesOnField(field int) bool {
 	return false
 }
 
+var validTickets []ticket
+
 func sumBad() int {
 	numberOfTickets := len(tickets)
 	sum := 0
 
 	for i := 1; i < numberOfTickets; i++ {
+		validTicket := true
 		for _, field := range tickets[i] {
 			if !checkAllRulesOnField(field) {
 				sum += field
+				validTicket = false
 			}
+		}
+
+		if validTicket {
+			validTickets = append(validTickets, tickets[i])
 		}
 	}
 
@@ -119,4 +127,5 @@ func main() {
 	}
 
 	fmt.Println("Part1:", sumBad())
+	fmt.Println(validTickets)
 }
