@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type rule struct {
@@ -25,19 +27,54 @@ func readRule(line string) {
 	rules = append(rules, newRule)
 }
 
+type ticket []int64
+
+var tickets []ticket
+
+func readTicket(line string) {
+	var newTicket ticket
+	for _, item := range strings.Split(line, ",") {
+		field, err := strconv.ParseInt(item, 10, 32)
+		if err != nil {
+			log.Fatalf("Error parsing field from %s: %s", item, err)
+		}
+
+		newTicket = append(newTicket, field)
+	}
+
+	tickets = append(tickets, newTicket)
+}
+
 func readFile(file *os.File) {
 	scanner := bufio.NewScanner(file)
+	index := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
-			break
+			continue
 		}
 
-		readRule(line)
+		if strings.Contains(line, "your ticket:") {
+			index++
+			continue
+		}
+
+		if strings.Contains(line, "nearby tickets:") {
+			continue
+		}
+
+		functions[index](line)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Scanner error: %s", err)
 	}
+}
+
+var functions []func(string)
+
+func init() {
+	functions = append(functions, readRule)
+	functions = append(functions, readTicket)
 }
 
 func main() {
@@ -58,4 +95,5 @@ func main() {
 	}
 
 	fmt.Println(rules)
+	fmt.Println(tickets)
 }
