@@ -47,7 +47,7 @@ func readTicket(line string) {
 
 func readFile(file *os.File) {
 	scanner := bufio.NewScanner(file)
-	index := 0
+	currentFunction := readRule
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
@@ -55,7 +55,7 @@ func readFile(file *os.File) {
 		}
 
 		if strings.Contains(line, "your ticket:") {
-			index++
+			currentFunction = readTicket
 			continue
 		}
 
@@ -63,18 +63,11 @@ func readFile(file *os.File) {
 			continue
 		}
 
-		functions[index](line)
+		currentFunction(line)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Scanner error: %s", err)
 	}
-}
-
-var functions []func(string)
-
-func init() {
-	functions = append(functions, readRule)
-	functions = append(functions, readTicket)
 }
 
 func main() {
