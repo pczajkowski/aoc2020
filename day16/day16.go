@@ -106,6 +106,7 @@ func sumBad() int {
 		}
 	}
 
+	validTickets = append(validTickets, tickets[0])
 	return sum
 }
 
@@ -129,20 +130,18 @@ func ruleTaken(ruleID int) bool {
 	return false
 }
 
-func establishOrder() {
-	numberOfFields := len(validTickets[0])
-	numberOfRules := len(rules)
+func establishOrder() bool {
+	numberOfFields := len(rules)
 
 	for i := 0; i < numberOfFields; i++ {
-		j := 0
-		for ; j < numberOfRules; j++ {
+		for j, currentRule := range rules {
 			if ruleTaken(j) {
 				continue
 			}
 
 			ruleValid := true
 			for _, item := range validTickets {
-				if !checkRuleOnField(rules[j], item[i]) {
+				if !checkRuleOnField(currentRule, item[i]) {
 					ruleValid = false
 					break
 				}
@@ -154,6 +153,8 @@ func establishOrder() {
 			}
 		}
 	}
+
+	return len(fieldsAndRules) == numberOfFields
 }
 
 func checkMyTicket() int {
@@ -189,7 +190,10 @@ func main() {
 	}
 
 	fmt.Println("Part1:", sumBad())
+	fmt.Println(len(tickets), len(validTickets))
 
-	establishOrder()
+	if !establishOrder() {
+		log.Fatal("No order!")
+	}
 	fmt.Println("Part2:", checkMyTicket())
 }
