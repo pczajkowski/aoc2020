@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -23,6 +24,22 @@ func getTokens(line string) ([]rune, error) {
 	return tokens, nil
 }
 
+func getExpression(tokens []rune) []interface{} {
+	var expression []interface{}
+	for _, token := range tokens {
+		stringToken := string(token)
+		value, err := strconv.Atoi(stringToken)
+		if err != nil {
+			expression = append(expression, stringToken)
+			continue
+		}
+
+		expression = append(expression, value)
+	}
+
+	return expression
+}
+
 func readFile(file *os.File) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -36,10 +53,7 @@ func readFile(file *os.File) {
 			log.Fatalf("Error scanning %s: %s", line, err)
 		}
 
-		for _, token := range tokens {
-			fmt.Print(string(token), ",")
-		}
-		fmt.Println()
+		fmt.Println(getExpression(tokens))
 
 	}
 	if err := scanner.Err(); err != nil {
