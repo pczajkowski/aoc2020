@@ -64,9 +64,17 @@ func readFile(file *os.File) [][]interface{} {
 	return expressions
 }
 
-func getRPNFromExpression(expression []interface{}) []interface{} {
+var precedence map[string]int
+
+func init() {
+	precedence = make(map[string]int)
+	precedence["+"] = 1
+	precedence["*"] = 0
+}
+
+func getRPNFromExpression(expression []interface{}, withPrecedence bool) []interface{} {
 	var rpn []interface{}
-	var operators []interface{}
+	var operators []string
 
 	for _, token := range expression {
 		switch token := token.(type) {
@@ -88,6 +96,8 @@ func getRPNFromExpression(expression []interface{}) []interface{} {
 					rpn = append(rpn, oper)
 				}
 			default:
+				priority := precedence[token]
+
 				for len(operators) > 0 {
 					top := operators[len(operators)-1]
 
@@ -95,8 +105,19 @@ func getRPNFromExpression(expression []interface{}) []interface{} {
 						break
 					}
 
-					operators = operators[:len(operators)-1]
-					rpn = append(rpn, top)
+					prevPriority := precedence[top]
+
+					if withPrecedence {
+						if priority < prevPriority {
+							operators = operators[:len(operators)-1]
+							rpn = append(rpn, top)
+						} else {
+							break
+						}
+					} else {
+						operators = operators[:len(operators)-1]
+						rpn = append(rpn, top)
+					}
 				}
 
 				operators = append(operators, token)
@@ -154,7 +175,18 @@ func part1(expressions [][]interface{}) int {
 	sum := 0
 
 	for _, expression := range expressions {
-		rpn := getRPNFromExpression(expression)
+		rpn := getRPNFromExpression(expression, false)
+		sum += evaluateRPN(rpn)
+	}
+
+	return sum
+}
+
+func part2(expressions [][]interface{}) int {
+	sum := 0
+
+	for _, expression := range expressions {
+		rpn := getRPNFromExpression(expression, true)
 		sum += evaluateRPN(rpn)
 	}
 
@@ -179,4 +211,5 @@ func main() {
 	}
 
 	fmt.Println("Part1:", part1(expressions))
+	fmt.Println("Part2:", part2(expressions))
 }
