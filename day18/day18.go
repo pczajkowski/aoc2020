@@ -8,12 +8,13 @@ import (
 	"strings"
 )
 
-func getTokens(line string) ([]string, error) {
+func getTokens(line string) ([]rune, error) {
 	scanner := bufio.NewScanner(strings.NewReader(line))
 	scanner.Split(bufio.ScanWords)
-	var tokens []string
+	var tokens []rune
 	for scanner.Scan() {
-		tokens = append(tokens, scanner.Text())
+		newTokens := []rune(scanner.Text())
+		tokens = append(tokens, newTokens...)
 	}
 	if err := scanner.Err(); err != nil {
 		return tokens, fmt.Errorf("Scanner error: %s", err)
@@ -35,7 +36,10 @@ func readFile(file *os.File) {
 			log.Fatalf("Error scanning %s: %s", line, err)
 		}
 
-		fmt.Println(strings.Join(tokens, ","))
+		for _, token := range tokens {
+			fmt.Print(string(token), ",")
+		}
+		fmt.Println()
 
 	}
 	if err := scanner.Err(); err != nil {
