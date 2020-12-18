@@ -114,6 +114,53 @@ func getRPNFromExpression(expression []interface{}) []interface{} {
 	return rpn
 }
 
+func doMath(operator string, arg1, arg2 int) int {
+	switch operator {
+	case "+":
+		return arg1 + arg2
+	case "*":
+		return arg1 * arg2
+	}
+
+	return -1
+}
+
+func evaluateRPN(rpn []interface{}) int {
+	var stack []int
+
+	for _, token := range rpn {
+		switch token := token.(type) {
+		case int:
+			stack = append(stack, token)
+		case string:
+			if len(stack) < 2 {
+				log.Fatalf("Invalid expresion token %s in %s!", token, rpn)
+			}
+
+			arg1, arg2 := stack[len(stack)-2], stack[len(stack)-1]
+			stack = stack[:len(stack)-2]
+			value := doMath(token, arg1, arg2)
+			stack = append(stack, value)
+		}
+	}
+	if len(stack) != 1 {
+		log.Fatal("Bad stack!")
+	}
+
+	return stack[len(stack)-1]
+}
+
+func part1(expressions [][]interface{}) int {
+	sum := 0
+
+	for _, expression := range expressions {
+		rpn := getRPNFromExpression(expression)
+		sum += evaluateRPN(rpn)
+	}
+
+	return sum
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -131,7 +178,5 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	for _, expression := range expressions {
-		fmt.Println(getRPNFromExpression(expression))
-	}
+	fmt.Println("Part1:", part1(expressions))
 }
