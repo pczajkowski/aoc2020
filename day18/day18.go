@@ -40,7 +40,8 @@ func getExpression(tokens []rune) []interface{} {
 	return expression
 }
 
-func readFile(file *os.File) {
+func readFile(file *os.File) [][]interface{} {
+	var expressions [][]interface{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -53,12 +54,64 @@ func readFile(file *os.File) {
 			log.Fatalf("Error scanning %s: %s", line, err)
 		}
 
-		fmt.Println(getExpression(tokens))
+		expressions = append(expressions, getExpression(tokens))
 
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Scanner error: %s", err)
 	}
+
+	return expressions
+}
+
+func getRPNFromExpression(expression []interface{}) []interface{} {
+	var rpn []interface{}
+	var operators []interface{}
+
+	for _, token := range expression {
+		switch token := token.(type) {
+		case int:
+			rpn = append(rpn, token)
+		case string:
+			switch token {
+			case "(":
+				operators = append(operators, token)
+			case ")":
+				for len(operators) > 0 {
+					oper := operators[len(operators)-1]
+					operators = operators[:len(operators)-1]
+
+					if oper == "(" {
+						break
+					}
+
+					rpn = append(rpn, oper)
+				}
+			default:
+				for len(operators) > 0 {
+					top := operators[len(operators)-1]
+
+					if top == "(" {
+						break
+					}
+
+					operators = operators[:len(operators)-1]
+					rpn = append(rpn, top)
+				}
+
+				operators = append(operators, token)
+			}
+
+		}
+	}
+	for len(operators) > 0 {
+		oper := operators[len(operators)-1]
+		operators = operators[:len(operators)-1]
+
+		rpn = append(rpn, oper)
+	}
+
+	return rpn
 }
 
 func main() {
@@ -73,8 +126,12 @@ func main() {
 
 	}
 
-	readFile(file)
+	expressions := readFile(file)
 	if err := file.Close(); err != nil {
 		log.Fatalf("Failed to close file: %s", err)
+	}
+
+	for _, expression := range expressions {
+		fmt.Println(getRPNFromExpression(expression))
 	}
 }
