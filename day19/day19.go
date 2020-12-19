@@ -151,12 +151,11 @@ func part2(max int) int {
 	valid := 0
 	thirtyOne := buildStringsForRule(31, []string{""})
 	fortyTwo := buildStringsForRule(42, []string{""})
-	length31 := len(thirtyOne[0])
-	length42 := len(fortyTwo[0])
+	length := len(thirtyOne[0])
 
-	currentLength := length31 + 2*length42
+	currentLength := 3 * length
 	for len(notMatched) > 0 && currentLength <= max {
-		currentLength += length31
+		currentLength += length
 		var toCheck []string
 
 		for _, message := range notMatched {
