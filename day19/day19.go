@@ -127,6 +127,68 @@ func part1(validStrings []string) int {
 	return valid
 }
 
+func startsWith(toCheck []string, message string) bool {
+	for _, item := range toCheck {
+		if strings.HasPrefix(message, item) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func endsWith(toCheck []string, message string) bool {
+	for _, item := range toCheck {
+		if strings.HasSuffix(message, item) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func part2(max int) int {
+	valid := 0
+	thirtyOne := buildStringsForRule(31, []string{""})
+	fortyTwo := buildStringsForRule(42, []string{""})
+	length31 := len(thirtyOne[0])
+	length42 := len(fortyTwo[0])
+
+	currentLength := length31 + 2*length42
+	for len(notMatched) > 0 && currentLength <= max {
+		currentLength += length31
+		var toCheck []string
+
+		for _, message := range notMatched {
+			if len(message)%currentLength == 0 {
+				if startsWith(fortyTwo, message) && endsWith(thirtyOne, message) {
+					valid++
+				} else {
+					toCheck = append(toCheck, message)
+				}
+			} else {
+				toCheck = append(toCheck, message)
+			}
+		}
+
+		notMatched = toCheck
+	}
+
+	return valid
+}
+
+func longest() int {
+	max := 0
+	for _, message := range notMatched {
+		length := len(message)
+		if length > max {
+			max = length
+		}
+	}
+
+	return max
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -145,9 +207,9 @@ func main() {
 	}
 
 	validStrings := buildStringsForRule(0, []string{""})
-	fmt.Println("Part1:", part1(validStrings))
+	resultPart1 := part1(validStrings)
+	fmt.Println("Part1:", resultPart1)
 
-	fmt.Println(notMatched)
-	fmt.Println("42:", buildStringsForRule(42, []string{""}))
-	fmt.Println("31:", buildStringsForRule(31, []string{""}))
+	max := longest()
+	fmt.Println("Part2:", resultPart1+part2(max))
 }
