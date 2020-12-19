@@ -105,15 +105,22 @@ func buildStringsForRule(ruleID int, stringsSoFar []string) []string {
 	return newStrings
 }
 
+var notMatched []string
+
 func part1(validStrings []string) int {
 	valid := 0
 
 	for _, message := range messages {
+		matched := false
 		for _, item := range validStrings {
 			if message == item {
 				valid++
+				matched = true
 				break
 			}
+		}
+		if !matched {
+			notMatched = append(notMatched, message)
 		}
 	}
 
@@ -139,4 +146,8 @@ func main() {
 
 	validStrings := buildStringsForRule(0, []string{""})
 	fmt.Println("Part1:", part1(validStrings))
+
+	fmt.Println(notMatched)
+	fmt.Println("42:", buildStringsForRule(42, []string{""}))
+	fmt.Println("31:", buildStringsForRule(31, []string{""}))
 }
