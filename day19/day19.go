@@ -82,6 +82,44 @@ func readFile(file *os.File) {
 	}
 }
 
+func buildStringsForRule(ruleID int, stringsSoFar []string) []string {
+	var newStrings []string
+
+	if rules[ruleID].value != "" {
+		for _, item := range stringsSoFar {
+			item += rules[ruleID].value
+			newStrings = append(newStrings, item)
+		}
+		return newStrings
+	}
+
+	for _, item := range stringsSoFar {
+		for _, array := range rules[ruleID].mapping {
+			partial := []string{item}
+			for _, id := range array {
+				partial = buildStringsForRule(id, partial)
+			}
+			newStrings = append(newStrings, partial...)
+		}
+	}
+	return newStrings
+}
+
+func part1(validStrings []string) int {
+	valid := 0
+
+	for _, message := range messages {
+		for _, item := range validStrings {
+			if message == item {
+				valid++
+				break
+			}
+		}
+	}
+
+	return valid
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -99,5 +137,6 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	fmt.Println(rules, messages)
+	validStrings := buildStringsForRule(0, []string{""})
+	fmt.Println("Part1:", part1(validStrings))
 }
