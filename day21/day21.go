@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -144,6 +145,25 @@ func part1(foods []dish, badIngredients map[string]string) int {
 	return sum
 }
 
+func part2(badIngredients map[string]string) string {
+	allergenIngredient := make(map[string]string)
+	var keys []string
+
+	for key, value := range badIngredients {
+		allergenIngredient[value] = key
+		keys = append(keys, value)
+	}
+
+	sort.Strings(keys)
+
+	var results []string
+	for _, key := range keys {
+		results = append(results, allergenIngredient[key])
+	}
+
+	return strings.Join(results, ",")
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -166,4 +186,5 @@ func main() {
 	badIngredients := analyse(highestAllergens)
 
 	fmt.Println("Part1:", part1(foods, badIngredients))
+	fmt.Println("Part2:", part2(badIngredients))
 }
