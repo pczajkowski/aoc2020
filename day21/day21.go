@@ -51,51 +51,33 @@ func readFile(file *os.File) []dish {
 	return foods
 }
 
-type ingredient struct {
-	count             int
-	possibleAllergens map[string]int
+type alerg struct {
+	count       int
+	ingredients map[string]int
 }
 
-func processFoods(foods []dish) map[string]ingredient {
-	processedIngredients := make(map[string]ingredient)
+func processFoods(foods []dish) map[string]alerg {
+	allergensPossibleForIngredients := make(map[string]alerg)
 
 	for _, food := range foods {
-		for _, item := range food.ingredients {
-			var currentIngredient ingredient
-			if _, ok := processedIngredients[item]; !ok {
-				currentIngredient = ingredient{count: 0, possibleAllergens: make(map[string]int)}
+		for _, allergen := range food.allergens {
+			var currentAllergen alerg
+			if _, ok := allergensPossibleForIngredients[allergen]; !ok {
+				currentAllergen = alerg{count: 0, ingredients: make(map[string]int)}
 			} else {
-				currentIngredient = processedIngredients[item]
+				currentAllergen = allergensPossibleForIngredients[allergen]
 			}
 
-			currentIngredient.count++
-			for _, allergen := range food.allergens {
-				currentIngredient.possibleAllergens[allergen]++
+			currentAllergen.count++
+			for _, ingredient := range food.ingredients {
+				currentAllergen.ingredients[ingredient]++
 			}
 
-			processedIngredients[item] = currentIngredient
+			allergensPossibleForIngredients[allergen] = currentAllergen
 		}
 	}
 
-	return processedIngredients
-}
-
-func part1(processedIngredients map[string]ingredient) int {
-	sum := 0
-
-	for _, item := range processedIngredients {
-		countPossibleAllergens := 0
-
-		for _, value := range item.possibleAllergens {
-			countPossibleAllergens += value
-		}
-
-		if countPossibleAllergens <= item.count {
-			sum += item.count
-		}
-	}
-
-	return sum
+	return allergensPossibleForIngredients
 }
 
 func main() {
@@ -115,6 +97,6 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	processedIngredients := processFoods(foods)
-	fmt.Println("Part1:", part1(processedIngredients))
+	allergens := processFoods(foods)
+	fmt.Println(allergens)
 }
