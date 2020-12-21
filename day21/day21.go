@@ -80,6 +80,24 @@ func processFoods(foods []dish) map[string]ingredient {
 	return processedIngredients
 }
 
+func part1(processedIngredients map[string]ingredient) int {
+	sum := 0
+
+	for _, item := range processedIngredients {
+		countPossibleAllergens := 0
+
+		for _, value := range item.possibleAllergens {
+			countPossibleAllergens += value
+		}
+
+		if countPossibleAllergens <= item.count {
+			sum += item.count
+		}
+	}
+
+	return sum
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -98,5 +116,5 @@ func main() {
 	}
 
 	processedIngredients := processFoods(foods)
-	fmt.Println(processedIngredients)
+	fmt.Println("Part1:", part1(processedIngredients))
 }
