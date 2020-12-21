@@ -98,6 +98,48 @@ func findAllergicIngredients(allergensPossibleForIngredients map[string]alerg) m
 	return highestAllergens
 }
 
+func onList(item string, list []string) bool {
+	for _, element := range list {
+		if item == element {
+			return true
+		}
+	}
+
+	return false
+}
+
+func analyse(highestAllergens map[string][]string) {
+	var foundIngredients []string
+	found := 0
+	target := len(highestAllergens)
+
+	for found < target {
+		currentAllergens := make(map[string][]string)
+		for key, value := range highestAllergens {
+			if len(value) == 1 {
+				foundIngredients = append(foundIngredients, value[0])
+				found++
+				continue
+			}
+
+			var newList []string
+			for _, item := range value {
+				if onList(item, foundIngredients) {
+					continue
+				}
+
+				newList = append(newList, item)
+			}
+
+			currentAllergens[key] = newList
+		}
+
+		highestAllergens = currentAllergens
+	}
+
+	fmt.Println(foundIngredients)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -116,5 +158,6 @@ func main() {
 	}
 
 	allergens := processFoods(foods)
-	fmt.Println(findAllergicIngredients(allergens))
+	highestAllergens := findAllergicIngredients(allergens)
+	analyse(highestAllergens)
 }
