@@ -20,8 +20,8 @@ func readDish(line string) dish {
 		log.Fatalf("Invalid line: %s", line)
 	}
 
-	for _, ingredient := range strings.Split(parts[0], " ") {
-		food.ingredients = append(food.ingredients, ingredient)
+	for _, ing := range strings.Split(parts[0], " ") {
+		food.ingredients = append(food.ingredients, ing)
 	}
 
 	cleanedPart2 := strings.TrimSuffix(parts[1], ")")
@@ -51,6 +51,35 @@ func readFile(file *os.File) []dish {
 	return foods
 }
 
+type ingredient struct {
+	count             int
+	possibleAllergens map[string]int
+}
+
+func processFoods(foods []dish) map[string]ingredient {
+	processedIngredients := make(map[string]ingredient)
+
+	for _, food := range foods {
+		for _, item := range food.ingredients {
+			var currentIngredient ingredient
+			if _, ok := processedIngredients[item]; !ok {
+				currentIngredient = ingredient{count: 0, possibleAllergens: make(map[string]int)}
+			} else {
+				currentIngredient = processedIngredients[item]
+			}
+
+			currentIngredient.count++
+			for _, allergen := range food.allergens {
+				currentIngredient.possibleAllergens[allergen]++
+			}
+
+			processedIngredients[item] = currentIngredient
+		}
+	}
+
+	return processedIngredients
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -68,5 +97,6 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	fmt.Println(foods)
+	processedIngredients := processFoods(foods)
+	fmt.Println(processedIngredients)
 }
