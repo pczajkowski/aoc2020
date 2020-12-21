@@ -108,7 +108,7 @@ func onList(item string, list []string) bool {
 	return false
 }
 
-func analyse(highestAllergens map[string][]string) {
+func analyse(highestAllergens map[string][]string) []string {
 	var foundIngredients []string
 	found := 0
 	target := len(highestAllergens)
@@ -137,7 +137,21 @@ func analyse(highestAllergens map[string][]string) {
 		highestAllergens = currentAllergens
 	}
 
-	fmt.Println(foundIngredients)
+	return foundIngredients
+}
+
+func part1(foods []dish, badIngredients []string) int {
+	sum := 0
+
+	for _, food := range foods {
+		for _, ingredient := range food.ingredients {
+			if !onList(ingredient, badIngredients) {
+				sum++
+			}
+		}
+	}
+
+	return sum
 }
 
 func main() {
@@ -159,5 +173,7 @@ func main() {
 
 	allergens := processFoods(foods)
 	highestAllergens := findAllergicIngredients(allergens)
-	analyse(highestAllergens)
+	badIngredients := analyse(highestAllergens)
+
+	fmt.Println("Part1:", part1(foods, badIngredients))
 }
