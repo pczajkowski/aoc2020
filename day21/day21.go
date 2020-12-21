@@ -98,8 +98,8 @@ func findAllergicIngredients(allergensPossibleForIngredients map[string]alerg) m
 	return highestAllergens
 }
 
-func analyse(highestAllergens map[string][]string) map[string]bool {
-	foundIngredients := make(map[string]bool)
+func analyse(highestAllergens map[string][]string) map[string]string {
+	foundIngredients := make(map[string]string)
 	found := 0
 	target := len(highestAllergens)
 
@@ -107,14 +107,14 @@ func analyse(highestAllergens map[string][]string) map[string]bool {
 		currentAllergens := make(map[string][]string)
 		for key, value := range highestAllergens {
 			if len(value) == 1 {
-				foundIngredients[value[0]] = true
+				foundIngredients[value[0]] = key
 				found++
 				continue
 			}
 
 			var newList []string
 			for _, item := range value {
-				if foundIngredients[item] {
+				if _, ok := foundIngredients[item]; ok {
 					continue
 				}
 
@@ -130,12 +130,12 @@ func analyse(highestAllergens map[string][]string) map[string]bool {
 	return foundIngredients
 }
 
-func part1(foods []dish, badIngredients map[string]bool) int {
+func part1(foods []dish, badIngredients map[string]string) int {
 	sum := 0
 
 	for _, food := range foods {
 		for _, ingredient := range food.ingredients {
-			if !badIngredients[ingredient] {
+			if _, ok := badIngredients[ingredient]; !ok {
 				sum++
 			}
 		}
