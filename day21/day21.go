@@ -80,6 +80,24 @@ func processFoods(foods []dish) map[string]alerg {
 	return allergensPossibleForIngredients
 }
 
+func findAllergicIngredients(allergensPossibleForIngredients map[string]alerg) map[string][]string {
+	highestAllergens := make(map[string][]string)
+
+	for allergen, item := range allergensPossibleForIngredients {
+		var highestIngredients []string
+
+		for key, value := range item.ingredients {
+			if value == item.count {
+				highestIngredients = append(highestIngredients, key)
+			}
+		}
+
+		highestAllergens[allergen] = highestIngredients
+	}
+
+	return highestAllergens
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -98,5 +116,5 @@ func main() {
 	}
 
 	allergens := processFoods(foods)
-	fmt.Println(allergens)
+	fmt.Println(findAllergicIngredients(allergens))
 }
