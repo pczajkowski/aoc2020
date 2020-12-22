@@ -85,8 +85,11 @@ func checkDeck(deck []int, deckFromRound []int) bool {
 }
 
 func checkDecks(deck1, deck2 []int, previousRounds []previous) bool {
+	deck1Length := len(deck1)
+	deck2Length := len(deck2)
+
 	for _, round := range previousRounds {
-		if len(deck1) != len(round.deck1) || len(deck2) != len(round.deck2) {
+		if deck1Length != len(round.deck1) || deck2Length != len(round.deck2) {
 			continue
 		}
 		if checkDeck(deck1, round.deck1) && checkDeck(deck2, round.deck2) {
