@@ -89,7 +89,7 @@ func checkDecks(deck1, deck2 []int, previousRounds []previous) bool {
 		if len(deck1) != len(round.deck1) || len(deck2) != len(round.deck2) {
 			continue
 		}
-		if checkDeck(deck1, round.deck1) || checkDeck(deck2, round.deck2) {
+		if checkDeck(deck1, round.deck1) && checkDeck(deck2, round.deck2) {
 			return true
 		}
 	}
