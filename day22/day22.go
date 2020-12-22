@@ -48,7 +48,7 @@ func readFile(file *os.File) [2][]int {
 	return decks
 }
 
-func play1(decks [2][]int) (int, []int) {
+func play1(decks [2][]int) []int {
 	for {
 		if len(decks[0]) == 0 || len(decks[1]) == 0 {
 			break
@@ -70,9 +70,9 @@ func play1(decks [2][]int) (int, []int) {
 	}
 
 	if len(decks[0]) == 0 {
-		return 1, decks[1]
+		return decks[1]
 	}
-	return 0, decks[0]
+	return decks[0]
 }
 
 func checkDeck(deck []int, deckFromRound []int) bool {
@@ -199,8 +199,8 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	_, winningDeck := play1(decks)
-	fmt.Println("Part1:", calculate(winningDeck))
+	winningDeck1 := play1(decks)
+	fmt.Println("Part1:", calculate(winningDeck1))
 
 	_, winningDeck2 := play2(decks)
 	fmt.Println("Part2:", calculate(winningDeck2))
