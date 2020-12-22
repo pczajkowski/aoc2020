@@ -75,6 +75,19 @@ func play(decks [2][]int) []int {
 	return decks[0]
 }
 
+func part1(deck []int) int {
+	result := 0
+	multiplyBy := 1
+	index := len(deck) - 1
+
+	for ; index >= 0; index-- {
+		result += deck[index] * multiplyBy
+		multiplyBy++
+	}
+
+	return result
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -92,5 +105,6 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	fmt.Println(play(decks))
+	winningDeck := play(decks)
+	fmt.Println("Part1:", part1(winningDeck))
 }
