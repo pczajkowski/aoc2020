@@ -166,7 +166,7 @@ func play2(decks [2][]int) (int, []int) {
 	if len(decks[0]) == 0 {
 		return 1, decks[1]
 	}
-	return 1, decks[0]
+	return 0, decks[0]
 }
 
 func calculate(deck []int) int {
