@@ -48,7 +48,7 @@ func readFile(file *os.File) [2][]int {
 	return decks
 }
 
-func play1(decks [2][]int) []int {
+func play1(decks [2][]int) (int, []int) {
 	for {
 		if len(decks[0]) == 0 || len(decks[1]) == 0 {
 			break
@@ -70,9 +70,81 @@ func play1(decks [2][]int) []int {
 	}
 
 	if len(decks[0]) == 0 {
-		return decks[1]
+		return 1, decks[1]
 	}
-	return decks[0]
+	return 0, decks[0]
+}
+
+func checkDeck(deck []int, deckFromRound []int) bool {
+	for i, card := range deck {
+		if card != deckFromRound[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func checkDecks(deck1, deck2 []int, previousRounds []previous) bool {
+	for _, round := range previousRounds {
+		if checkDeck(deck1, round.deck1) || checkDeck(deck2, round.deck2) {
+			return true
+		}
+	}
+
+	return false
+}
+
+type previous struct {
+	deck1 []int
+	deck2 []int
+}
+
+func play2(decks [2][]int) []int {
+	var previousRounds []previous
+
+	for {
+		if len(previousRounds) > 0 {
+			if checkDecks(decks[0], decks[1], previousRounds) {
+				return decks[0]
+			}
+		}
+
+		previousRounds = append(previousRounds, previous{deck1: decks[0], deck2: decks[1]})
+
+		player1Hand := decks[0][0]
+		decks[0] = decks[0][1:len(decks[0])]
+
+		player2Hand := decks[1][0]
+		decks[1] = decks[1][1:len(decks[1])]
+
+		if len(decks[0]) >= player1Hand && len(decks[1]) >= player2Hand {
+			var newDecks [2][]int
+			for i, card := range decks[0] {
+				if i >= player1Hand {
+					break
+				}
+
+				newDecks[0] = append(newDecks[0], card)
+			}
+
+			for i, card := range decks[1] {
+				if i >= player1Hand {
+					break
+				}
+
+				newDecks[1] = append(newDecks[1], card)
+			}
+
+		} else {
+			if player1Hand > player2Hand {
+				decks[0] = append(decks[0], player1Hand)
+				decks[0] = append(decks[0], player2Hand)
+			} else {
+				decks[1] = append(decks[1], player2Hand)
+				decks[1] = append(decks[1], player1Hand)
+			}
+		}
+	}
 }
 
 func calculate(deck []int) int {
@@ -105,6 +177,6 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	winningDeck := play1(decks)
+	_, winningDeck := play1(decks)
 	fmt.Println("Part1:", calculate(winningDeck))
 }
