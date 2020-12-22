@@ -86,6 +86,9 @@ func checkDeck(deck []int, deckFromRound []int) bool {
 
 func checkDecks(deck1, deck2 []int, previousRounds []previous) bool {
 	for _, round := range previousRounds {
+		if len(deck1) != len(round.deck1) || len(deck2) != len(round.deck2) {
+			continue
+		}
 		if checkDeck(deck1, round.deck1) || checkDeck(deck2, round.deck2) {
 			return true
 		}
@@ -99,13 +102,17 @@ type previous struct {
 	deck2 []int
 }
 
-func play2(decks [2][]int) []int {
+func play2(decks [2][]int) (int, []int) {
 	var previousRounds []previous
 
 	for {
+		if len(decks[0]) == 0 || len(decks[1]) == 0 {
+			break
+		}
+
 		if len(previousRounds) > 0 {
 			if checkDecks(decks[0], decks[1], previousRounds) {
-				return decks[0]
+				return 0, decks[0]
 			}
 		}
 
@@ -128,13 +135,22 @@ func play2(decks [2][]int) []int {
 			}
 
 			for i, card := range decks[1] {
-				if i >= player1Hand {
+				if i >= player2Hand {
 					break
 				}
 
 				newDecks[1] = append(newDecks[1], card)
 			}
 
+			winner, _ := play2(newDecks)
+
+			if winner == 0 {
+				decks[0] = append(decks[0], player1Hand)
+				decks[0] = append(decks[0], player2Hand)
+			} else {
+				decks[1] = append(decks[1], player2Hand)
+				decks[1] = append(decks[1], player1Hand)
+			}
 		} else {
 			if player1Hand > player2Hand {
 				decks[0] = append(decks[0], player1Hand)
@@ -144,7 +160,13 @@ func play2(decks [2][]int) []int {
 				decks[1] = append(decks[1], player1Hand)
 			}
 		}
+
 	}
+
+	if len(decks[0]) == 0 {
+		return 1, decks[1]
+	}
+	return 1, decks[0]
 }
 
 func calculate(deck []int) int {
@@ -179,4 +201,7 @@ func main() {
 
 	_, winningDeck := play1(decks)
 	fmt.Println("Part1:", calculate(winningDeck))
+
+	_, winningDeck2 := play2(decks)
+	fmt.Println("Part2:", calculate(winningDeck2))
 }
