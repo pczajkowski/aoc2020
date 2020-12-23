@@ -80,7 +80,7 @@ func part1(sequence []int, min, max int) {
 	index := 0
 	size := len(sequence)
 
-	for i := 0; i < 10; i++ {
+	for iterations := 0; iterations < 10; iterations++ {
 		pickup := getThreeCups(sequence, index+1)
 		for j, _ := range sequence {
 			if j > index && j < index+4 {
@@ -89,23 +89,28 @@ func part1(sequence []int, min, max int) {
 		}
 
 		destination := sequence[index] - 1
+		fmt.Println(index, destination)
 		for {
-			if !inSequence(destination, pickup) {
-				break
-			}
-
-			destination--
 			if destination < min {
 				_, newDestination := minMax(sequence)
 				destination = newDestination
 				break
 			}
+
+			if !inSequence(destination, pickup) {
+				break
+			}
+
+			destination--
 		}
 
 		fmt.Println(pickup, destination)
 		newSequence := make([]int, size)
-		i = index + 1
+		i := index + 1
 		j := index + 4
+		if j > size-1 {
+			j = j - size
+		}
 		count := 0
 		for count < size {
 			count++
@@ -144,7 +149,7 @@ func part1(sequence []int, min, max int) {
 		fmt.Println(newSequence)
 		sequence = newSequence
 		index++
-		if index < 0 {
+		if index > size-1 {
 			index = 0
 		}
 	}
