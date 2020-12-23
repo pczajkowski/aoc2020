@@ -98,12 +98,6 @@ func getSequence(sequence []int, min, max int) []int {
 			}
 		}
 
-		for j, _ := range sequence {
-			if j > index && j < index+4 {
-				sequence[j] = 0
-			}
-		}
-
 		destination := sequence[index] - 1
 		for {
 			if destination < min {
