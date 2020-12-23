@@ -81,8 +81,23 @@ func getSequence(sequence []int, min, max int) []int {
 	index := 0
 	size := len(sequence)
 
-	for iterations := 0; iterations < 10; iterations++ {
+	for iterations := 0; iterations < 100; iterations++ {
 		pickup := getThreeCups(sequence, index+1)
+
+		x := 0
+		y := index + 1
+		if y > size-1 {
+			y = 0
+		}
+		for x < 3 {
+			sequence[y] = 0
+			x++
+			y++
+			if y > size-1 {
+				y = 0
+			}
+		}
+
 		for j, _ := range sequence {
 			if j > index && j < index+4 {
 				sequence[j] = 0
