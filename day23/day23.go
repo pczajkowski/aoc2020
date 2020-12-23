@@ -59,12 +59,29 @@ func indexOf(value int, sequence []int) int {
 	return -1
 }
 
+func getThreeCups(sequence []int, index int) []int {
+	count := 0
+	length := len(sequence) - 1
+	var cups []int
+	for count < 3 {
+		if index > length {
+			index = 0
+		}
+
+		cups = append(cups, sequence[index])
+		count++
+		index++
+	}
+
+	return cups
+}
+
 func part1(sequence []int, min, max int) {
 	index := 0
 	size := len(sequence)
 
 	for i := 0; i < 10; i++ {
-		pickup := sequence[index+1 : index+4]
+		pickup := getThreeCups(sequence, index+1)
 		for j, _ := range sequence {
 			if j > index && j < index+4 {
 				sequence[j] = 0
@@ -72,7 +89,6 @@ func part1(sequence []int, min, max int) {
 		}
 
 		destination := sequence[index] - 1
-		fmt.Println(destination)
 		for {
 			if !inSequence(destination, pickup) {
 				break
@@ -86,41 +102,38 @@ func part1(sequence []int, min, max int) {
 			}
 		}
 
-		fmt.Println(sequence)
-		fmt.Println(destination)
-
-		partialSequence := make([]int, size)
-		i := index + 1
-		for {
-			partialSequence[i] = sequence[i]
-			if i == index {
-				i++
-				break
-			}
-			i++
+		fmt.Println(pickup, destination)
+		newSequence := make([]int, size)
+		i = index + 1
+		j := index + 4
+		count := 0
+		for count < size {
+			count++
 			if i > size-1 {
 				i = 0
 			}
-		}
 
-		destinationIndex := indexOf(destination, partialSequence)
-		if destinationIndex < 0 {
-			log.Fatalf("Wrong destinationIndex: %d", destinationIndex)
-		}
+			if j > size-1 {
+				j = 0
+			}
 
-		newSequence := make([]int, size)
-		i = destinationIndex
-		for j := destinationIndex; ; j++ {
-			newSequence[j] = partialSequence[i]
+			newSequence[i] = sequence[j]
 
-			if j == destinationIndex {
-				j++
+			if sequence[j] == destination {
+				i++
+
 				for _, cup := range pickup {
-					newSequence[j] = cup
-					j++
+					if i > size-1 {
+						i = 0
+					}
+
+					newSequence[i] = cup
+					i++
 				}
 
-				i++
+				count += 3
+
+				j++
 				continue
 			}
 
@@ -128,6 +141,7 @@ func part1(sequence []int, min, max int) {
 			i++
 		}
 
+		fmt.Println(newSequence)
 		sequence = newSequence
 		index++
 		if index < 0 {
