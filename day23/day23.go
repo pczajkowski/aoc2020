@@ -80,20 +80,21 @@ func getThreeCups(sequence []int, index int) []int {
 func getSequence(sequence []int, min, max int) []int {
 	index := 0
 	size := len(sequence)
+	length := size - 1
 
 	for iterations := 0; iterations < 100; iterations++ {
 		pickup := getThreeCups(sequence, index+1)
 
 		x := 0
 		y := index + 1
-		if y > size-1 {
+		if y > length {
 			y = 0
 		}
 		for x < 3 {
 			sequence[y] = 0
 			x++
 			y++
-			if y > size-1 {
+			if y > length {
 				y = 0
 			}
 		}
@@ -116,17 +117,17 @@ func getSequence(sequence []int, min, max int) []int {
 		newSequence := make([]int, size)
 		i := index + 1
 		j := index + 4
-		if j > size-1 {
+		if j > length {
 			j = j - size
 		}
 		count := 0
 		for count < size {
 			count++
-			if i > size-1 {
+			if i > length {
 				i = 0
 			}
 
-			if j > size-1 {
+			if j > length {
 				j = 0
 			}
 
@@ -136,7 +137,7 @@ func getSequence(sequence []int, min, max int) []int {
 				i++
 
 				for _, cup := range pickup {
-					if i > size-1 {
+					if i > length {
 						i = 0
 					}
 
@@ -156,7 +157,7 @@ func getSequence(sequence []int, min, max int) []int {
 
 		sequence = newSequence
 		index++
-		if index > size-1 {
+		if index > length {
 			index = 0
 		}
 	}
