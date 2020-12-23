@@ -22,10 +22,30 @@ func processSequence(input string) []int {
 	return sequence
 }
 
+func minMax(sequence []int) (int, int) {
+	max := 0
+	min := 9
+
+	for _, cup := range sequence {
+		if cup > max {
+			max = cup
+		}
+
+		if cup < min {
+			min = cup
+		}
+	}
+
+	return min, max
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a sequence!")
 	}
 
-	fmt.Println(processSequence(os.Args[1]))
+	sequence := processSequence(os.Args[1])
+	min, max := minMax(sequence)
+
+	fmt.Println(min, max)
 }
