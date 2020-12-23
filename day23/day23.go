@@ -61,16 +61,14 @@ func indexOf(value int, sequence []int) int {
 
 func part1(sequence []int, min, max int) {
 	index := 0
+	size := len(sequence)
 
 	for i := 0; i < 10; i++ {
 		pickup := sequence[index+1 : index+4]
-		var partialSequence []int
-		for j, item := range sequence {
+		for j, _ := range sequence {
 			if j > index && j < index+4 {
-				continue
+				sequence[j] = 0
 			}
-
-			partialSequence = append(partialSequence, item)
 		}
 
 		destination := sequence[index] - 1
@@ -82,27 +80,52 @@ func part1(sequence []int, min, max int) {
 
 			destination--
 			if destination < min {
-				_, newDestination := minMax(partialSequence)
+				_, newDestination := minMax(sequence)
 				destination = newDestination
 				break
 			}
 		}
 
+		fmt.Println(sequence)
 		fmt.Println(destination)
+
+		partialSequence := make([]int, size)
+		i := index + 1
+		for {
+			partialSequence[i] = sequence[i]
+			if i == index {
+				i++
+				break
+			}
+			i++
+			if i > size-1 {
+				i = 0
+			}
+		}
+
 		destinationIndex := indexOf(destination, partialSequence)
 		if destinationIndex < 0 {
 			log.Fatalf("Wrong destinationIndex: %d", destinationIndex)
 		}
 
-		var newSequence []int
-		for j, item := range partialSequence {
-			newSequence = append(newSequence, item)
+		newSequence := make([]int, size)
+		i = destinationIndex
+		for j := destinationIndex; ; j++ {
+			newSequence[j] = partialSequence[i]
 
 			if j == destinationIndex {
+				j++
 				for _, cup := range pickup {
-					newSequence = append(newSequence, cup)
+					newSequence[j] = cup
+					j++
 				}
+
+				i++
+				continue
 			}
+
+			j++
+			i++
 		}
 
 		sequence = newSequence
@@ -110,7 +133,6 @@ func part1(sequence []int, min, max int) {
 		if index < 0 {
 			index = 0
 		}
-		fmt.Println(sequence)
 	}
 }
 
