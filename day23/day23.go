@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func processSequence(input string) []int {
@@ -76,7 +77,7 @@ func getThreeCups(sequence []int, index int) []int {
 	return cups
 }
 
-func part1(sequence []int, min, max int) {
+func getSequence(sequence []int, min, max int) []int {
 	index := 0
 	size := len(sequence)
 
@@ -89,7 +90,6 @@ func part1(sequence []int, min, max int) {
 		}
 
 		destination := sequence[index] - 1
-		fmt.Println(index, destination)
 		for {
 			if destination < min {
 				_, newDestination := minMax(sequence)
@@ -104,7 +104,6 @@ func part1(sequence []int, min, max int) {
 			destination--
 		}
 
-		fmt.Println(pickup, destination)
 		newSequence := make([]int, size)
 		i := index + 1
 		j := index + 4
@@ -146,13 +145,30 @@ func part1(sequence []int, min, max int) {
 			i++
 		}
 
-		fmt.Println(newSequence)
 		sequence = newSequence
 		index++
 		if index > size-1 {
 			index = 0
 		}
 	}
+
+	return sequence
+}
+
+func part1(sequence []int) string {
+	size := len(sequence)
+	indexOfOne := indexOf(1, sequence)
+
+	var result []string
+	for i := indexOfOne + 1; i < size; i++ {
+		result = append(result, fmt.Sprintf("%d", sequence[i]))
+	}
+
+	for i := 0; i < indexOfOne; i++ {
+		result = append(result, fmt.Sprintf("%d", sequence[i]))
+	}
+
+	return strings.Join(result, "")
 }
 
 func main() {
@@ -162,6 +178,7 @@ func main() {
 
 	sequence := processSequence(os.Args[1])
 	min, max := minMax(sequence)
+	finalSequence := getSequence(sequence, min, max)
 
-	part1(sequence, min, max)
+	fmt.Println("Part1:", part1(finalSequence))
 }
