@@ -77,12 +77,12 @@ func getThreeCups(sequence []int, index int) []int {
 	return cups
 }
 
-func getSequence(sequence []int, min, max int) []int {
+func getSequence(sequence []int, min, max, iterations int) []int {
 	index := 0
 	size := len(sequence)
 	length := size - 1
 
-	for iterations := 0; iterations < 100; iterations++ {
+	for iteration := 0; iteration < iterations; iteration++ {
 		pickup := getThreeCups(sequence, index+1)
 
 		x := 0
@@ -188,7 +188,7 @@ func main() {
 
 	sequence := processSequence(os.Args[1])
 	min, max := minMax(sequence)
-	finalSequence := getSequence(sequence, min, max)
+	finalSequence := getSequence(sequence, min, max, 100)
 
 	fmt.Println("Part1:", part1(finalSequence))
 }
