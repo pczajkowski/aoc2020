@@ -44,6 +44,38 @@ func readFile(file *os.File) [][]string {
 	return paths
 }
 
+type position struct {
+	x float64
+	y float64
+}
+
+func makeMove(path []string) position {
+	currentPosition := position{x: 0, y: 0}
+
+	for _, item := range path {
+		switch item {
+		case "e":
+			currentPosition.x += 1
+		case "w":
+			currentPosition.x -= 1
+		case "se":
+			currentPosition.x += 0.5
+			currentPosition.y -= 0.5
+		case "sw":
+			currentPosition.x -= 0.5
+			currentPosition.y -= 0.5
+		case "nw":
+			currentPosition.x -= 0.5
+			currentPosition.y += 0.5
+		case "ne":
+			currentPosition.x += 0.5
+			currentPosition.y += 0.5
+		}
+	}
+
+	return currentPosition
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -61,5 +93,7 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	fmt.Println(paths)
+	for _, path := range paths {
+		fmt.Println(makeMove(path))
+	}
 }
