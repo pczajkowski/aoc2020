@@ -99,8 +99,17 @@ func part1(tiles map[position]int) map[position]int {
 	return blackTiles
 }
 
-func findNeighbours(tile position) {
+func findNeighbours(tile position) map[position]int {
+	neighbours := make(map[position]int)
 
+	neighbours[position{x: tile.x - 2, y: tile.y}] = 0
+	neighbours[position{x: tile.x + 2, y: tile.y}] = 0
+	neighbours[position{x: tile.x + 1, y: tile.y - 1}] = 0
+	neighbours[position{x: tile.x - 1, y: tile.y - 1}] = 0
+	neighbours[position{x: tile.x - 1, y: tile.y + 1}] = 0
+	neighbours[position{x: tile.x + 1, y: tile.y + 1}] = 0
+
+	return neighbours
 }
 
 func main() {
@@ -123,5 +132,7 @@ func main() {
 	tiles := makeAllMoves(paths)
 	blackTiles := part1(tiles)
 	fmt.Println("Part1:", len(blackTiles))
-	fmt.Println(blackTiles)
+	for key, _ := range blackTiles {
+		fmt.Println(findNeighbours(key))
+	}
 }
