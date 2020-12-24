@@ -87,16 +87,16 @@ func makeAllMoves(paths [][]string) map[position]int {
 	return moves
 }
 
-func part1(moves map[position]int) int {
-	black := 0
+func part1(tiles map[position]int) map[position]int {
+	blackTiles := make(map[position]int)
 
-	for _, value := range moves {
+	for key, value := range tiles {
 		if value%2 != 0 {
-			black++
+			blackTiles[key] = 1
 		}
 	}
 
-	return black
+	return blackTiles
 }
 
 func main() {
@@ -116,6 +116,7 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	moves := makeAllMoves(paths)
-	fmt.Println("Part1:", part1(moves))
+	tiles := makeAllMoves(paths)
+	blackTiles := part1(tiles)
+	fmt.Println("Part1:", len(blackTiles))
 }
