@@ -45,8 +45,8 @@ func readFile(file *os.File) [][]string {
 }
 
 type position struct {
-	x float64
-	y float64
+	x int
+	y int
 }
 
 func makeMove(path []string) position {
@@ -55,21 +55,21 @@ func makeMove(path []string) position {
 	for _, item := range path {
 		switch item {
 		case "e":
-			currentPosition.x += 1
+			currentPosition.x += 2
 		case "w":
-			currentPosition.x -= 1
+			currentPosition.x -= 2
 		case "se":
-			currentPosition.x += 0.5
-			currentPosition.y -= 0.5
+			currentPosition.x += 1
+			currentPosition.y -= 1
 		case "sw":
-			currentPosition.x -= 0.5
-			currentPosition.y -= 0.5
+			currentPosition.x -= 1
+			currentPosition.y -= 1
 		case "nw":
-			currentPosition.x -= 0.5
-			currentPosition.y += 0.5
+			currentPosition.x -= 1
+			currentPosition.y += 1
 		case "ne":
-			currentPosition.x += 0.5
-			currentPosition.y += 0.5
+			currentPosition.x += 1
+			currentPosition.y += 1
 		}
 	}
 
@@ -99,6 +99,10 @@ func part1(tiles map[position]int) map[position]int {
 	return blackTiles
 }
 
+func findNeighbours(tile position) {
+
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -119,4 +123,5 @@ func main() {
 	tiles := makeAllMoves(paths)
 	blackTiles := part1(tiles)
 	fmt.Println("Part1:", len(blackTiles))
+	fmt.Println(blackTiles)
 }
