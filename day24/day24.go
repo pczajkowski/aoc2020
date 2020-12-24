@@ -129,7 +129,7 @@ func flip(blackTiles map[position]int) map[position]int {
 	for key, _ := range blackTiles {
 		neighbours := findNeighbours(key)
 		blackNeighbours := numberOfBlackNeighbours(neighbours, blackTiles)
-		if blackNeighbours > 0 || blackNeighbours <= 2 {
+		if blackNeighbours > 0 && blackNeighbours <= 2 {
 			newBlackTiles[key] = 0
 		}
 
