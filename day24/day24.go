@@ -112,6 +112,42 @@ func findNeighbours(tile position) map[position]int {
 	return neighbours
 }
 
+func numberOfBlackNeighbours(neighbours map[position]int, blackTiles map[position]int) int {
+	black := 0
+	for neighbour, _ := range neighbours {
+		if _, ok := blackTiles[neighbour]; ok {
+			black++
+		}
+	}
+
+	return black
+}
+
+func flip(blackTiles map[position]int) map[position]int {
+	newBlackTiles := make(map[position]int)
+
+	for key, _ := range blackTiles {
+		neighbours := findNeighbours(key)
+		blackNeighbours := numberOfBlackNeighbours(neighbours, blackTiles)
+		if blackNeighbours > 0 || blackNeighbours <= 2 {
+			newBlackTiles[key] = 0
+		}
+
+		for neighbour, _ := range neighbours {
+			if _, ok := blackTiles[neighbour]; ok {
+				continue
+			}
+
+			anotherNeighbours := findNeighbours(neighbour)
+			if numberOfBlackNeighbours(anotherNeighbours, blackTiles) == 2 {
+				newBlackTiles[neighbour] = 0
+			}
+		}
+	}
+
+	return newBlackTiles
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -132,7 +168,6 @@ func main() {
 	tiles := makeAllMoves(paths)
 	blackTiles := part1(tiles)
 	fmt.Println("Part1:", len(blackTiles))
-	for key, _ := range blackTiles {
-		fmt.Println(findNeighbours(key))
-	}
+
+	fmt.Println(len(flip(blackTiles)))
 }
