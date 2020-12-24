@@ -76,6 +76,29 @@ func makeMove(path []string) position {
 	return currentPosition
 }
 
+func makeAllMoves(paths [][]string) map[position]int {
+	moves := make(map[position]int)
+
+	for _, path := range paths {
+		currentPosition := makeMove(path)
+		moves[currentPosition] += 1
+	}
+
+	return moves
+}
+
+func part1(moves map[position]int) int {
+	black := 0
+
+	for _, value := range moves {
+		if value%2 != 0 {
+			black++
+		}
+	}
+
+	return black
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -93,7 +116,6 @@ func main() {
 		log.Fatalf("Failed to close file: %s", err)
 	}
 
-	for _, path := range paths {
-		fmt.Println(makeMove(path))
-	}
+	moves := makeAllMoves(paths)
+	fmt.Println("Part1:", part1(moves))
 }
