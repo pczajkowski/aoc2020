@@ -148,6 +148,13 @@ func flip(blackTiles map[position]int) map[position]int {
 	return newBlackTiles
 }
 
+func do100Flips(blackTiles map[position]int) int {
+	for i := 0; i < 100; i++ {
+		blackTiles = flip(blackTiles)
+	}
+	return len(blackTiles)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -169,5 +176,5 @@ func main() {
 	blackTiles := part1(tiles)
 	fmt.Println("Part1:", len(blackTiles))
 
-	fmt.Println(len(flip(blackTiles)))
+	fmt.Println("Part2:", do100Flips(blackTiles))
 }
