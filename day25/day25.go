@@ -46,6 +46,17 @@ func establishLoopSize(key int) int {
 	return iterations
 }
 
+func transform(subject int, iterations int) int {
+	value := 1
+
+	for i := 0; i < iterations; i++ {
+		value *= subject
+		value %= 20201227
+	}
+
+	return value
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("You need to specify a file!")
@@ -66,5 +77,10 @@ func main() {
 	key1LoopSize := establishLoopSize(keys[0])
 	key2LoopSize := establishLoopSize(keys[1])
 
-	fmt.Println(key1LoopSize, key2LoopSize)
+	encryptionKey1 := transform(keys[1], key1LoopSize)
+	encryptionKey2 := transform(keys[0], key2LoopSize)
+
+	if encryptionKey1 == encryptionKey2 {
+		fmt.Println("Part1:", encryptionKey1)
+	}
 }
