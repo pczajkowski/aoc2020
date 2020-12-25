@@ -32,26 +32,30 @@ func readFile(file *os.File) []int {
 	return keys
 }
 
+func transformValue(value, subject int) int {
+	value *= subject
+	value %= 20201227
+
+	return value
+}
+
 func establishLoopSize(key int) int {
 	iterations := 0
 	value := 1
 
 	for value != key {
-		value *= 7
-		value %= 20201227
-
+		value = transformValue(value, 7)
 		iterations++
 	}
 
 	return iterations
 }
 
-func transform(subject int, iterations int) int {
+func transform(subject, iterations int) int {
 	value := 1
 
 	for i := 0; i < iterations; i++ {
-		value *= subject
-		value %= 20201227
+		value = transformValue(value, subject)
 	}
 
 	return value
